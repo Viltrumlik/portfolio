@@ -21,17 +21,19 @@ A production-grade, reusable Django portfolio template with a dynamic, CMS-like 
 - **Pagination**: For blog articles and projects
 - **RSS Feed**: Blog syndication at `/blog/feed/`
 - **Sitemap**: Dynamic sitemap at `/sitemap.xml`
-- **Markdown Rendering**: For blog articles with syntax highlighting
+- **Markdown Rendering**: For blog articles (fenced code, tables, table of contents; install `Pygments` for code highlighting)
 - **Search & Filters**: In admin and frontend
 - **Slug-based URLs**: Clean, SEO-friendly URLs
 
 ## 🛠 Tech Stack
 
 - **Backend**: Django 5.2+, Python 3.12+
-- **Database**: SQLite (development), PostgreSQL ready for production
-- **Frontend**: HTML5, CSS3, JavaScript, Font Awesome
-- **Admin**: Django Summernote for rich text editing
-- **Deployment**: Ready for Gunicorn + Nginx
+- **Database**: SQLite by default (edit `DATABASES` in `portfolio_project/settings.py` to use PostgreSQL)
+- **Frontend**: HTML5, CSS3, JavaScript, Three.js (animated 3D orb), Font Awesome
+- **Admin**: Django Unfold theme, Django Summernote for rich text editing
+- **Static files**: WhiteNoise (compressed, cache-busted)
+- **Config**: `python-dotenv` (`.env` file)
+- **Deployment**: Ready for Gunicorn + Nginx, or Passenger via `passenger_wsgi.py`
 
 ## 📦 Installation
 
@@ -43,6 +45,7 @@ A production-grade, reusable Django portfolio template with a dynamic, CMS-like 
 
 1. **Clone and Navigate**
    ```bash
+   git clone https://github.com/Viltrumlik/portfolio.git
    cd portfolio
    ```
 
@@ -60,32 +63,39 @@ A production-grade, reusable Django portfolio template with a dynamic, CMS-like 
    pip install -r requirements.txt
    ```
 
-4. **Run Migrations**
+4. **Configure Environment**
+   ```bash
+   cp .env.example .env
+   ```
+   Then set at least your own `SECRET_KEY` in `.env` (see [Configuration](#-configuration)).
+
+5. **Run Migrations**
    ```bash
    python manage.py migrate
    ```
 
-5. **Create Superuser**
+6. **Create Superuser**
    ```bash
    python manage.py createsuperuser
    ```
 
-6. **Populate Initial Data**
+7. **Populate Initial Data**
    ```bash
    python manage.py populate_data
    ```
+   Alternatively, `python manage.py populate_from_github [--user <github-username>] [--skip-cards]` loads the author's own curated content from `core/data/github_content.py` and merges in live repository data from the GitHub API (it also generates project preview cards). Edit `core/data/github_content.py` before using it for your own site.
 
-7. **Collect Static Files**
+8. **Collect Static Files**
    ```bash
    python manage.py collectstatic
    ```
 
-8. **Run Development Server**
+9. **Run Development Server**
    ```bash
    python manage.py runserver
    ```
 
-9. **Access the Application**
+10. **Access the Application**
    - Website: http://127.0.0.1:8000/
    - Admin: http://127.0.0.1:8000/admin/
 
@@ -158,35 +168,59 @@ portfolio/
 │   ├── portfolio/              # Portfolio app templates
 │   └── blog/                   # Blog app templates
 ├── static/                     # Static files
-│   ├── css/                    # CSS files
-│   ├── js/                     # JavaScript files
+│   ├── css/                    # CSS files (futuristic.css is the active theme)
+│   ├── js/                     # JavaScript files (site-fx.js)
 │   └── images/                 # Image files
-├── media/                      # User uploaded files
-└── staticfiles/                # Collected static files
+├── public/
+│   ├── static/                 # Collected static files (STATIC_ROOT)
+│   └── media/                  # User uploaded files (MEDIA_ROOT)
+├── passenger_wsgi.py           # Entry point for Passenger hosting
+├── .env.example                # Environment variable template
+└── requirements.txt
 ```
 
 ## 🔧 Configuration
 
-### Email Settings (Contact Form)
-Update `portfolio_project/settings.py` with your email configuration:
+Settings are read from environment variables, loaded from a `.env` file in the project root (copy `.env.example`):
 
-```python
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your-email@gmail.com'
-EMAIL_HOST_PASSWORD = 'your-app-password'
-DEFAULT_FROM_EMAIL = 'noreply@yourdomain.com'
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `SECRET_KEY` | development key | Django secret key — always set your own |
+| `DEBUG` | `True` | Set to `False` in production (enables secure cookies) |
+| `ALLOWED_HOSTS` | `localhost,127.0.0.1` | Comma-separated host names |
+| `CSRF_TRUSTED_ORIGINS` | empty | Comma-separated origins, e.g. `https://yourdomain.com` |
+| `SECURE_SSL_REDIRECT` | `False` | Redirect HTTP to HTTPS when `DEBUG=False` |
+| `EMAIL_BACKEND` | SMTP backend | Django email backend |
+| `EMAIL_HOST` / `EMAIL_PORT` / `EMAIL_USE_TLS` | `smtp.gmail.com` / `587` / `True` | SMTP server |
+| `EMAIL_HOST_USER` / `EMAIL_HOST_PASSWORD` | empty | SMTP credentials; leave empty to disable email delivery |
+| `DEFAULT_FROM_EMAIL` | `noreply@example.com` | Sender address |
+
+### Email Settings (Contact Form)
+Contact messages are always saved to the database. To also receive them by email, set the SMTP variables in `.env`:
+
+```bash
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_PASSWORD=your-app-password
+DEFAULT_FROM_EMAIL=noreply@yourdomain.com
 ```
 
 ### Production Settings
-For production deployment, update these settings:
+For production deployment, set these in `.env`:
+
+```bash
+SECRET_KEY=<a-long-random-secret>
+DEBUG=False
+ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+CSRF_TRUSTED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+SECURE_SSL_REDIRECT=True
+```
+
+The database is configured directly in `portfolio_project/settings.py` (SQLite by default). To use PostgreSQL, replace `DATABASES` there and install `psycopg`. Example `settings.py` changes for PostgreSQL and HSTS:
 
 ```python
-DEBUG = False
-ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
-
 # Database (PostgreSQL recommended)
 DATABASES = {
     'default': {
@@ -200,7 +234,6 @@ DATABASES = {
 }
 
 # Security
-SECURE_SSL_REDIRECT = True
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
@@ -210,7 +243,7 @@ SECURE_HSTS_PRELOAD = True
 
 ### Using Gunicorn + Nginx
 
-1. **Install Gunicorn**
+1. **Install Gunicorn** (already included in `requirements.txt`)
    ```bash
    pip install gunicorn
    ```
@@ -227,20 +260,24 @@ SECURE_HSTS_PRELOAD = True
        server_name yourdomain.com;
        
        location /static/ {
-           alias /path/to/portfolio/staticfiles/;
+           alias /path/to/portfolio/public/static/;
        }
        
        location /media/ {
-           alias /path/to/portfolio/media/;
+           alias /path/to/portfolio/public/media/;
        }
        
        location / {
            proxy_pass http://127.0.0.1:8000;
            proxy_set_header Host $host;
            proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-Proto $scheme;
        }
    }
    ```
+
+### Using Passenger (shared hosting)
+`passenger_wsgi.py` exposes the WSGI application for Passenger-based hosts (for example Serv00). It adds a `venv`/`.venv` in the project or home directory to `sys.path` and writes startup errors to `passenger_debug.log`.
 
 ### Using Docker
 Create `Dockerfile`:
@@ -267,8 +304,8 @@ CMD ["gunicorn", "portfolio_project.wsgi:application", "--bind", "0.0.0.0:8000"]
 4. Add URL patterns
 
 ### Modifying Design
-- Edit `static/css/style.css` for main styles
-- Edit `static/css/django-styles.css` for Django-specific styles
+- Edit `static/css/futuristic.css` for the active theme (loaded by `templates/base.html`)
+- Edit `static/js/site-fx.js` for front-end effects (the Three.js orb and animations)
 - Update templates in `templates/` directory
 
 ### Adding New Apps
@@ -287,6 +324,8 @@ CMD ["gunicorn", "portfolio_project.wsgi:application", "--bind", "0.0.0.0:8000"]
 ## 📄 License
 
 This project is open source and available under the [MIT License](LICENSE).
+
+Third-party assets loaded from CDNs (Three.js, Font Awesome, Google Fonts) keep their own licenses.
 
 ## 🆘 Support
 
