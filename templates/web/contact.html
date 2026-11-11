@@ -1,0 +1,12 @@
+{% extends "web/layout.html" %}{% load atlas %}
+{% block content %}
+{% window title="contact.md" active=True %}
+  <header class="at-pagehead">
+    <p class="mono-caps">Contact</p>
+    <h1 class="display-lg">Write to me</h1>
+    <p class="body-lg">Tell me about the project, the job or the bot that needs building.{% if profile.email %} You can also email <a href="mailto:{{ profile.email }}">{{ profile.email }}</a>.{% endif %}</p>
+  </header>
+  {% for message in messages %}<p class="at-note" role="status">{% icon "check" 16 %}<span>{{ message }}</span></p>{% endfor %}
+  {% include "web/partials/contact_form.html" %}
+{% endwindow %}
+{% endblock %}

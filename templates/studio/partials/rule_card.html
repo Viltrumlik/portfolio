@@ -1,0 +1,18 @@
+{% load atlas %}{% with rule=card.rule %}{% window title=card.title label=rule.name cls="at-rule" active=active %}
+  <h2 class="st-rule__name">{{ rule.name }}{% if rule.is_builtin %} {% badge "Built-in" %}{% endif %}</h2>
+  <div class="at-rule__flow">
+    <div class="at-rule__step"><span class="at-rule__word">When</span><div class="at-rule__body">{% service_code card.trigger.code card.trigger.service "sm" %}<div><div class="at-rule__label">{{ card.trigger.label }}</div>{% if card.trigger.detail %}<div class="at-rule__detail">{{ card.trigger.detail }}</div>{% endif %}</div></div></div>
+    <span class="at-rule__arrow" aria-hidden="true">{% icon "arrow-right" 16 %}</span>
+    <div class="at-rule__step"><span class="at-rule__word">Then</span><div class="at-rule__body">{% service_code card.action.code card.action.service "sm" %}<div><div class="at-rule__label">{{ card.action.label }}</div>{% if card.action.detail %}<div class="at-rule__detail">{{ card.action.detail }}</div>{% endif %}</div></div></div>
+  </div>
+  <footer class="at-rule__foot">
+    <span class="at-rule__stats">{{ card.stats }}</span>
+    <span class="st-rule__end">
+      {% if not hide_edit %}{% url 'studio:rule' rule.pk as edit_url %}{% button "Edit" href=edit_url variant="ghost" size="sm" %}{% endif %}
+      <form method="post" action="{% url 'studio:rule_toggle' rule.pk %}" class="st-inline">{% csrf_token %}
+        <input type="hidden" name="enabled" value="{{ rule.is_enabled|yesno:'0,1' }}"><input type="hidden" name="next" value="{{ request.path }}">
+        <span class="at-switch-wrap"><button id="rule-{{ rule.pk }}-switch" type="submit" role="switch" aria-checked="{{ rule.is_enabled|yesno:'true,false' }}" class="at-switch{% if rule.is_enabled %} is-on{% endif %}"><span class="at-switch__thumb"></span></button><label for="rule-{{ rule.pk }}-switch" class="at-switch__label">Enabled</label></span>
+      </form>
+    </span>
+  </footer>
+{% endwindow %}{% endwith %}

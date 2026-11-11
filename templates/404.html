@@ -1,0 +1,16 @@
+{% extends "web/layout.html" %}{% load atlas %}
+{% block title %}Not found · {{ profile.name }}{% endblock %}
+{% block meta %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+{% window title="errors/404.log" active=True cls="at-win--error" %}
+  <header class="at-pagehead">
+    <p class="mono-caps">{% icon "alert" 14 %} Error 404</p>
+    <h1 class="display-lg">Nothing lives at this address</h1>
+    <p class="body-lg">{{ request_path|default:request.path }} doesn't exist. The page may have moved, or the link has a typo. Start from the desk or the project list.</p>
+  </header>
+  <div class="at-row">
+    {% button "Go to the desk" href="/" variant="primary" icon_right="arrow-right" %}
+    {% button "See my work" href="/work/" icon_right="arrow-right" %}
+  </div>
+{% endwindow %}
+{% endblock %}

@@ -1,0 +1,177 @@
+/* Generated from tokens.json by scripts/tokens-to-css.mjs. Do not edit by hand. */
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --desk: #0c0d0f;
+  --desk-dot: #1f2226;
+  --window: #15171a;
+  --window-bar: #1b1e22;
+  --well: #1f2226;
+  --edge: #2e3238;
+  --edge-strong: #6b717b;
+  --ink: #ecedee;
+  --ink-muted: #8f949d;
+  --lime: #c5f82a;
+  --lime-edge: #c5f82a;
+  --on-lime: #0c0d0f;
+  --signal: #c5f82a;
+  --signal-soft: #26300d;
+  --danger: #ff6b4a;
+  --danger-soft: #3a170e;
+  --heat-0: #1f2226;
+  --heat-1: #3c481e;
+  --heat-2: #6d8722;
+  --heat-3: #9ec626;
+  --heat-4: #c5f82a;
+  --link: var(--signal);
+  --shadow-hard: 5px 5px 0 0 #000000;
+  --shadow-lift: 8px 8px 0 0 #000000;
+  --shadow-sm: 3px 3px 0 0 #000000;
+  --focus-ring: 0 0 0 2px #0c0d0f, 0 0 0 4px #c5f82a;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --desk: #b7c6ad;
+  --desk-dot: #8fa186;
+  --window: #fffdf7;
+  --window-bar: #fffdf7;
+  --well: #ebe6da;
+  --edge: #151515;
+  --edge-strong: #151515;
+  --ink: #151515;
+  --ink-muted: #4a4a44;
+  --lime: #c5f82a;
+  --lime-edge: #151515;
+  --on-lime: #0c0d0f;
+  --signal: #4d6a00;
+  --signal-soft: #eef7cf;
+  --danger: #b8300d;
+  --danger-soft: #fde3dc;
+  --heat-0: #ebe6da;
+  --heat-1: #c4e06a;
+  --heat-2: #a9d23a;
+  --heat-3: #7fa615;
+  --heat-4: #4d6a00;
+  --link: var(--signal);
+  --shadow-hard: 5px 5px 0 0 #151515;
+  --shadow-lift: 8px 8px 0 0 #151515;
+  --shadow-sm: 3px 3px 0 0 #151515;
+  --focus-ring: 0 0 0 2px #fffdf7, 0 0 0 4px #151515;
+}
+
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+  --radius-xs: 3px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-pill: 999px;
+  --container-max: 1240px;
+  --measure: 64ch;
+  --columns: 12;
+  --desk-pitch: 18px;
+  --font-sans: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Martian Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+.display-xl {
+  font-family: var(--font-sans);
+  font-size: 72px;
+  line-height: 72px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.display-lg {
+  font-family: var(--font-sans);
+  font-size: 48px;
+  line-height: 50px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.headline {
+  font-family: var(--font-sans);
+  font-size: 32px;
+  line-height: 34px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.title {
+  font-family: var(--font-sans);
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.body-lg {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 400;
+}
+
+.body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+}
+
+.body-sm {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+
+.label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+}
+
+.mono-sm {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 500;
+}
+
+.mono-caps {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.numeral {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+}

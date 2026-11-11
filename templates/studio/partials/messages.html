@@ -1,0 +1,3 @@
+{% load atlas %}{% for message in messages %}{% if message.level_tag == "error" %}
+<p class="at-note at-note--danger" role="alert">{% icon "alert" 16 %}<span>{{ message }}</span></p>{% else %}
+<p class="at-note" role="status">{% icon "check" 16 %}<span>{{ message }}</span></p>{% endif %}{% endfor %}

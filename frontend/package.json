@@ -1,0 +1,29 @@
+{
+  "name": "atlas-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Atlas design system CSS and interactive islands for the Django portfolio.",
+  "scripts": {
+    "tokens": "node scripts/tokens-to-css.mjs",
+    "predev": "npm run tokens",
+    "dev": "vite",
+    "prebuild": "npm run tokens",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "preact": "10.26.4"
+  },
+  "devDependencies": {
+    "@babel/core": "7.27.4",
+    "@preact/preset-vite": "2.10.1",
+    "@types/node": "22.15.30",
+    "jsdom": "26.1.0",
+    "typescript": "5.8.3",
+    "vite": "6.3.5",
+    "vitest": "3.2.4"
+  }
+}

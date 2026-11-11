@@ -1,0 +1,16 @@
+{% load atlas %}{% window title="connections/"|add:card.provider label=card.name cls=card.cls id=win_id x=card.x y=card.y w=w delay=card.delay active=active %}
+  <header class="at-integ__head">
+    {% service_code card.code size="lg" %}
+    <div class="at-integ__title"><h3>{{ card.name }}</h3><p>{{ card.description }}</p></div>
+    {% badge card.badge.label tone=card.badge.tone dot=card.badge.dot pulse=card.badge.pulse icon=card.badge.icon %}
+  </header>
+  {% if card.status != "off" and card.facts %}<dl class="at-integ__facts">{% for key, value in card.facts %}<dt>{{ key }}</dt><dd>{{ value }}</dd>{% endfor %}</dl>{% endif %}
+  {% if card.status == "error" and card.last_error %}<p class="at-integ__error" role="alert">{% icon "alert" 16 %}<span>{{ card.last_error }}{% if card.error_code %} <code class="st-code">{{ card.error_code }}</code>{% endif %}</span></p>{% endif %}
+  <footer class="at-integ__actions">
+    {% if card.status == "off" %}{% button "Connect" href=card.url|add:"#connect" variant="primary" size="sm" icon="link" %}
+    {% elif card.status == "error" %}{% button "Reconnect" href=card.url|add:"#connect" variant="primary" size="sm" icon="refresh" %}
+    {% elif card.status == "connected" %}<form method="post" action="{{ card.sync_url }}" class="st-inline">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">{% button "Sync now" type="submit" size="sm" icon="refresh" %}</form>
+    {% elif card.status == "syncing" %}<button type="button" class="at-btn at-btn--secondary at-btn--sm" disabled>{% icon "refresh" 14 %}<span>Syncing…</span></button>{% endif %}
+    {% if card.status != "off" %}{% button "Disconnect" href=card.disconnect_url variant="ghost" size="sm" %}{% endif %}
+  </footer>
+{% endwindow %}

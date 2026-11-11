@@ -1,0 +1,43 @@
+{% extends "studio/layout.html" %}{% load atlas %}
+{% block page_title %}{% if rule %}{{ rule.name }}{% else %}New rule{% endif %} · Automations{% endblock %}
+{% block content %}
+{% if card %}{% include "studio/partials/rule_card.html" with hide_edit=True %}{% endif %}
+
+<div class="{% if rule %}st-split{% else %}at-stack{% endif %}">
+  {% window title=card.title|default:"rules/new" active=True id="rule-form" label="Rule settings" %}
+    <form method="post" action="{{ request.path }}" class="at-form at-stack">
+      {% csrf_token %}
+      {% include "studio/partials/form_errors.html" %}
+      {% include "studio/partials/field.html" with field=form.name %}
+      {% include "studio/partials/field.html" with field=form.trigger %}
+      {% include "studio/partials/field.html" with field=form.repo %}
+      {% include "studio/partials/field.html" with field=form.branch %}
+      {% include "studio/partials/field.html" with field=form.action %}
+      <div class="st-preview" data-island="template-preview" data-sample="{{ sample_json }}">
+        {% include "studio/partials/field.html" with field=form.template %}
+        <p class="mono-caps st-muted">Preview with a sample event</p>
+        <pre class="st-preview__out" data-template-output aria-live="polite">{{ preview }}</pre>
+        {% if sample_keys %}<p class="at-field__msg"><span>Keys: {% for key in sample_keys %}<code class="st-code">{{ key }}</code> {% endfor %}</span></p>{% endif %}
+      </div>
+      {% include "studio/partials/field.html" with field=form.hook %}
+      <div class="at-row">
+        {% if rule %}{% button "Save rule" type="submit" variant="primary" icon="check" %}{% else %}{% button "Create rule" type="submit" variant="primary" icon="plus" %}{% endif %}
+        {% url 'studio:automations' as back %}{% button "Back to rules" href=back variant="ghost" %}
+      </div>
+    </form>
+    {% if rule and not rule.is_builtin %}
+    <form method="post" action="{% url 'studio:rule_delete' rule.pk %}" class="st-danger-zone">
+      {% csrf_token %}
+      <p class="body-sm">Deleting removes the rule and its run history.</p>
+      {% button "Delete rule" type="submit" variant="ghost" size="sm" icon="x" %}
+    </form>
+    {% endif %}
+  {% endwindow %}
+
+  {% if rule %}
+  {% window title="runs.log" label="Recent runs" %}
+    {% if runs %}{% activity_feed runs label="Recent runs" %}{% else %}<p class="body-sm st-muted">No runs yet. The rule runs when its trigger fires{% if not rule.is_enabled %} and it is on{% endif %}.</p>{% endif %}
+  {% endwindow %}
+  {% endif %}
+</div>
+{% endblock %}

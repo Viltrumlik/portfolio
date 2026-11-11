@@ -1,0 +1,21 @@
+/* Island-only styles that are not part of the Atlas component sheet. */
+
+/* Command palette overlay: the palette window centred over a dimmed desk. */
+.at-cmdk {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 12vh var(--space-4) var(--space-4);
+  overflow-y: auto;
+  background: rgba(12, 13, 15, 0.7);
+  background: color-mix(in srgb, var(--desk) 78%, transparent);
+}
+.at-cmdk > .at-cmd { animation: at-pop var(--dur) var(--ease-out); }
+
+@media (prefers-reduced-motion: reduce) {
+  .at-cmdk > .at-cmd { animation: none; }
+}

@@ -1,0 +1,58 @@
+<!doctype html>
+<!-- Dev-only island playground (npm run dev -> http://localhost:5173/playground.html). Not part of the build.
+     The markup here is the contract the Django templates emit. -->
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Atlas islands playground</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Martian+Mono:wght@400;500&display=swap"
+    />
+    <script type="module" src="/src/main.ts"></script>
+    <style>
+      main { max-width: var(--container-max); margin: 0 auto; padding: var(--space-6); display: grid; gap: var(--space-5); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="at-row">
+        <button class="at-btn at-btn--secondary" type="button" data-theme-toggle>Toggle theme</button>
+        <button class="at-btn at-btn--primary" type="button" data-cmdk-open>Search <kbd class="at-kbd">⌘K</kbd></button>
+        <span class="mono">Tashkent <time data-island="clock" data-tz="Asia/Tashkent" data-format="HH:MM:SS">--:--:--</time></span>
+      </div>
+
+      <div class="at-desk" data-island="desk" style="--desk-h: 420px">
+        <section class="at-win is-active" data-win="about" aria-label="about.md" style="--x:3%;--y:24px;--w:46%">
+          <div class="at-win__bar"><span class="at-win__ctl" aria-hidden="true"><i></i><i></i><i></i></span><span class="at-win__title">about.md</span></div>
+          <div class="at-win__body"><p class="headline">Backend systems that run themselves.</p></div>
+        </section>
+        <section class="at-win" data-win="now" aria-label="now.app" data-island="now" data-src="/api/live/now.json" style="--x:54%;--y:48px;--w:34%">
+          <div class="at-win__bar"><span class="at-win__ctl" aria-hidden="true"><i></i><i></i><i></i></span><span class="at-win__title">now.app</span></div>
+          <div class="at-win__body">
+            <p data-now-row="listening"><a data-now-field="track" href="#">Track</a> · <span data-now-field="artist">Artist</span> · <span data-now-field="played">played</span></p>
+            <p class="body-sm" data-now-field="availability">Open to work</p>
+          </div>
+        </section>
+      </div>
+
+      <section class="at-win" aria-label="rule.preview">
+        <div class="at-win__bar"><span class="at-win__ctl" aria-hidden="true"><i></i><i></i><i></i></span><span class="at-win__title">rule.preview</span></div>
+        <div class="at-win__body" data-island="template-preview" data-sample='{"repo":"volunteers_bot","tag":"v1.2","release":{"name":"Spring"}}'>
+          <textarea data-template-input rows="2" style="width:100%">Shipped {{repo}} {{tag}} ({{release.name}})</textarea>
+          <p class="mono" data-template-output></p>
+        </div>
+      </section>
+    </main>
+
+    <script type="application/json" id="atlas-cmdk">
+      {"groups":[
+        {"label":"Pages","items":[{"label":"Home","hint":"/","icon":"arrow-right","href":"/"},{"label":"Projects","hint":"/projects/","icon":"code","href":"/projects/"}]},
+        {"label":"Actions","items":[{"label":"Switch theme","icon":"zap","action":"theme","keywords":"light dark sage pulse"},{"label":"Copy email","hint":"hello@example.com","icon":"link","action":"copy:hello@example.com"}]}
+      ]}
+    </script>
+  </body>
+</html>

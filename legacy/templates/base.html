@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-motion="full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ seo.meta_title|default:site_settings.site_name }}{% endblock %}</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{% block meta_description %}{{ seo.meta_description }}{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}{{ seo.meta_keywords }}{% endblock %}">
+    <meta name="theme-color" content="#05060a">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title"
+        content="{% block og_title %}{{ seo.meta_title|default:site_settings.site_name }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ seo.meta_description }}{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    {% if seo.og_image %}
+    <meta property="og:image" content="{{ request.build_absolute_uri }}{{ seo.og_image.url }}">
+    {% elif site_settings.logo %}
+    <meta property="og:image" content="{{ request.build_absolute_uri }}{{ site_settings.logo.url }}">
+    {% endif %}
+
+    {% if site_settings.favicon %}
+    <link rel="icon" type="image/png" href="{{ site_settings.favicon.url }}">
+    {% endif %}
+
+    <!-- Fonts + icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/futuristic.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Background FX layers -->
+    <div class="fx-grid"></div>
+    <div class="fx-glow"></div>
+    <div class="fx-scan"></div>
+
+    {% include 'partials/navbar.html' %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'partials/footer.html' %}
+
+    <!-- Django Messages -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="{% static 'js/site-fx.js' %}" defer></script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

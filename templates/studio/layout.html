@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% load atlas studio_tags %}
+{% block title %}{% block page_title %}Desk{% endblock %} · Studio{% endblock %}
+{% block description %}The owner’s studio.{% endblock %}
+{% block meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block body_class %}at-site st-studio{% endblock %}
+{% block body %}
+<a class="at-skip" href="#main">Skip to content</a>
+{% studio_menubar %}
+<main id="main">
+  {% block hero %}{% endblock %}
+  <div class="at-page at-stack">
+    {% include "studio/partials/messages.html" %}
+    {% block content %}{% endblock %}
+  </div>
+</main>
+{% endblock %}

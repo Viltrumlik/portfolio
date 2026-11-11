@@ -1,0 +1,20 @@
+{% extends "web/layout.html" %}{% load atlas %}
+{% block content %}
+{% window title="projects/" active=True %}
+  <header class="at-pagehead">
+    <p class="mono-caps">Work</p>
+    <h1 class="display-lg">Things I built and still maintain</h1>
+    <p class="body-lg">{{ projects|length }} project{{ projects|length|pluralize }}{% if lang %} using {{ lang }}{% endif %}, from bots to learning platforms.</p>
+  </header>
+  {% if filters|length > 1 %}
+  <nav class="at-row" aria-label="Filter by language">
+    {% for f in filters %}{% if f.active %}{% button f.label href=f.href size="sm" aria_current="true" %}{% else %}{% button f.label href=f.href variant="ghost" size="sm" %}{% endif %}{% endfor %}
+  </nav>
+  {% endif %}
+  {% if projects %}
+  <div class="at-prow-list">{% for p in projects %}{% project_row p index=forloop.counter %}{% endfor %}</div>
+  {% else %}
+  <p class="body">No projects use {{ lang }} yet. {% button "Show all projects" href="/work/" variant="ghost" size="sm" icon_right="arrow-right" %}</p>
+  {% endif %}
+{% endwindow %}
+{% endblock %}

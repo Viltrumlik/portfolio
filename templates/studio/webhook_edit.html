@@ -1,0 +1,20 @@
+{% extends "studio/layout.html" %}{% load atlas %}
+{% block page_title %}{{ hook.name }} · Webhooks{% endblock %}
+{% block content %}
+{% window title="webhooks/edit" active=True label="Edit webhook" %}
+  <form method="post" action="{{ request.path }}" class="at-form at-stack" autocomplete="off">
+    {% csrf_token %}
+    {% include "studio/partials/form_errors.html" %}
+    {% for field in form %}{% include "studio/partials/field.html" %}{% endfor %}
+    <div class="at-row">
+      {% button "Save webhook" type="submit" variant="primary" icon="check" %}
+      {% url 'studio:webhooks' as back %}{% button "Back to webhooks" href=back variant="ghost" %}
+    </div>
+  </form>
+  <form method="post" action="{% url 'studio:webhook_delete' hook.pk %}" class="st-danger-zone">
+    {% csrf_token %}
+    <p class="body-sm">Deleting stops all deliveries. Rules that send here will fail until you pick another webhook.</p>
+    {% button "Delete webhook" type="submit" variant="ghost" size="sm" icon="x" %}
+  </form>
+{% endwindow %}
+{% endblock %}

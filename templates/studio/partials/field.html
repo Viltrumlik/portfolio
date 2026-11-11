@@ -1,0 +1,15 @@
+{% load atlas %}{% if field.is_hidden %}{{ field }}{% elif field.widget_type == "checkbox" %}
+<div class="st-checkfield{% if field.errors %} st-checkfield--error{% endif %}">
+  <label class="st-check" for="{{ field.id_for_label }}">{{ field }}<span>{{ field.label }}</span></label>
+  {% if field.errors %}<p id="{{ field.auto_id }}_error" class="at-field__msg">{% icon "alert" 14 %}<span>{{ field.errors|join:" " }}</span></p>{% elif field.help_text %}<p id="{{ field.auto_id }}_helptext" class="at-field__msg"><span>{{ field.help_text }}</span></p>{% endif %}
+</div>{% elif field.widget_type == "checkboxselectmultiple" %}
+<fieldset class="st-checks{% if field.errors %} st-checkfield--error{% endif %}">
+  <legend class="at-field__label">{{ field.label }}</legend>
+  {% for option in field %}<label class="st-check" for="{{ option.id_for_label }}">{{ option.tag }}<span>{{ option.choice_label }} <code class="st-code">{{ option.data.value }}</code></span></label>{% endfor %}
+  {% if field.errors %}<p id="{{ field.auto_id }}_error" class="at-field__msg">{% icon "alert" 14 %}<span>{{ field.errors|join:" " }}</span></p>{% elif field.help_text %}<p id="{{ field.auto_id }}_helptext" class="at-field__msg"><span>{{ field.help_text }}</span></p>{% endif %}
+</fieldset>{% else %}
+<div class="at-field{% if field.errors %} at-field--error{% endif %}">
+  <label class="at-field__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+  {{ field }}
+  {% if field.errors %}<p id="{{ field.auto_id }}_error" class="at-field__msg">{% icon "alert" 14 %}<span>{{ field.errors|join:" " }}</span></p>{% elif field.help_text %}<p id="{{ field.auto_id }}_helptext" class="at-field__msg"><span>{{ field.help_text }}</span></p>{% endif %}
+</div>{% endif %}

@@ -1,0 +1,24 @@
+{% extends "studio/layout.html" %}{% load atlas %}
+{% block page_title %}Content{% endblock %}
+{% block content %}
+<div class="st-split">
+  {% window title="profile.md" active=True id="profile" label="Profile" %}
+    <header class="at-pagehead">
+      <p class="mono-caps">Content</p>
+      <h1 class="headline">Profile</h1>
+      <p class="body">Your name, headline and availability appear in the menu bar, the about window and the footer.</p>
+    </header>
+    <form method="post" action="{{ request.path }}" class="at-form at-stack">
+      {% csrf_token %}
+      {% include "studio/partials/form_errors.html" %}
+      {% for field in form %}{% include "studio/partials/field.html" %}{% endfor %}
+      <div class="at-row">{% button "Save profile" type="submit" variant="primary" icon="check" %}</div>
+    </form>
+  {% endwindow %}
+  {% window title="content/" label="Content sections" %}
+    <ul class="st-list">
+      {% for section in sections %}<li><a href="{{ section.href }}">{{ section.label }}</a><span class="mono-sm st-muted">{{ section.count }}</span></li>{% endfor %}
+    </ul>
+  {% endwindow %}
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "studio/layout.html" %}{% load atlas %}
+{% block page_title %}Disconnect {{ name }}{% endblock %}
+{% block content %}
+{% window title="connections/"|add:provider|add:"/disconnect" active=True label="Disconnect "|add:name %}
+  <header class="at-pagehead">
+    <p class="mono-caps">Connections</p>
+    <h1 class="headline">{{ question }}</h1>
+  </header>
+  <form method="post" action="{{ request.path }}" class="at-row">
+    {% csrf_token %}
+    {% button "Disconnect "|add:name type="submit" variant="primary" icon="power" %}
+    {% url 'studio:connection' provider as back %}{% button "Keep it connected" href=back variant="ghost" %}
+  </form>
+{% endwindow %}
+{% endblock %}

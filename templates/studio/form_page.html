@@ -1,0 +1,28 @@
+{% extends "studio/layout.html" %}{% load atlas %}
+{% block page_title %}{{ heading }} · Content{% endblock %}
+{% block content %}
+{% window title=window_title active=True label=heading %}
+  <header class="at-pagehead">
+    <p class="mono-caps"><a href="{{ back_url }}">{{ back_label|cut:"Back to " }}</a></p>
+    <h1 class="headline">{{ heading }}</h1>
+    {% if intro %}<p class="mono-sm">{{ intro }}</p>{% endif %}
+  </header>
+  <form method="post" action="{{ request.path }}" class="at-form at-stack{% if wide %} st-form--wide{% endif %}">
+    {% csrf_token %}
+    {% include "studio/partials/form_errors.html" %}
+    {% for field in form %}{% include "studio/partials/field.html" %}{% endfor %}
+    <div class="at-row">
+      {% button submit_label type="submit" variant="primary" icon="check" %}
+      {% button back_label href=back_url variant="ghost" %}
+      {% if view_url %}{% button "View on the site" href=view_url variant="ghost" icon_right="arrow-up-right" %}{% endif %}
+    </div>
+  </form>
+  {% if delete_url %}
+  <form method="post" action="{{ delete_url }}" class="st-danger-zone">
+    {% csrf_token %}
+    <p class="body-sm">Deleting removes it from the site right away.</p>
+    {% button delete_label type="submit" variant="ghost" size="sm" icon="x" %}
+  </form>
+  {% endif %}
+{% endwindow %}
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "studio/layout.html" %}{% load atlas %}
+{% block page_title %}Desk{% endblock %}
+{% block hero %}
+{% desk height=1020 label="Studio desk" %}
+  {% for card in cards %}{% include "studio/partials/integration_card.html" with win_id="conn-"|add:card.provider w="31%" active=forloop.first %}{% endfor %}
+  {% window title="webhooks/" id="webhooks" x=hooks_pos.x y=hooks_pos.y w="31%" delay=hooks_pos.delay label="Outgoing webhooks" %}
+    <header class="at-integ__head">
+      {% service_code "WH" size="lg" %}
+      <div class="at-integ__title"><h3>Outgoing webhooks</h3><p>Signed events sent to n8n, Make or Zapier.</p></div>
+    </header>
+    {% if hooks %}<ul class="st-list">{% for hook in hooks %}<li><span>{{ hook.name }}</span>{% if hook.is_active %}{% badge "On" tone="live" dot=True %}{% else %}{% badge "Paused" %}{% endif %}</li>{% endfor %}</ul>
+    {% else %}<p class="body-sm st-muted">No webhooks yet.</p>{% endif %}
+    <div class="at-row">{% url 'studio:webhooks' as hooks_url %}{% button "Manage webhooks" href=hooks_url size="sm" icon_right="arrow-right" %}</div>
+  {% endwindow %}
+  {% window title="activity.log" id="log" x="68%" y=24 w="30%" delay=400 label="Sync log" %}
+    {% if log %}{% activity_feed log label="Sync log" %}{% else %}<p class="body-sm st-muted">Nothing has synced yet. Connect a service to start the log.</p>{% endif %}
+    <div class="at-row">{% url 'studio:jobs' as jobs_url %}{% button "Show failed jobs" href=jobs_url variant="ghost" size="sm" icon_right="arrow-right" %}</div>
+  {% endwindow %}
+  {% if dock_items %}{% dock dock_items label="Connected services" %}{% endif %}
+{% enddesk %}
+{% endblock %}
