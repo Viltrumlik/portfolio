@@ -1,0 +1,60 @@
+{% extends "web/layout.html" %}{% load atlas %}
+{% block content %}
+{% window title="about.md" active=True %}
+  <header class="at-pagehead">
+    <p class="mono-caps">{{ profile.name }}{% if profile.location %} · {{ profile.location }}{% endif %}</p>
+    <h1 class="display-lg">{{ profile.headline|default:profile.name }}</h1>
+  </header>
+  {% if bio_html %}<div class="at-prose">{{ bio_html }}</div>{% endif %}
+  <div class="at-row">
+    {% if profile.cv %}{% button "Download CV" href=profile.cv.url variant="primary" icon_right="arrow-up-right" %}{% endif %}
+    {% button "Write to me" href="/contact/" icon_right="arrow-right" %}
+  </div>
+{% endwindow %}
+
+{% if experience %}
+{% window title="experience.log" %}
+  {% section_header title="Where I have worked and studied" index="01" kicker="Experience" %}
+  <ol class="at-ledger">
+    {% for job, description_html in experience %}
+    <li class="at-ledger__row">
+      <span class="at-ledger__key mono-caps">{{ job.start_date|date:"M Y" }} — {% if job.end_date %}{{ job.end_date|date:"M Y" }}{% else %}Present{% endif %}</span>
+      <div class="at-ledger__body">
+        <h3 class="title">{{ job.role }}</h3>
+        <p class="at-ledger__meta">{{ job.company }}{% if job.location %} · {{ job.location }}{% endif %}</p>
+        {% if description_html %}<div class="at-prose">{{ description_html }}</div>{% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+{% endwindow %}
+{% endif %}
+
+{% if skill_groups %}
+{% window title="skills.json" %}
+  {% section_header title="Tools I reach for" index="02" kicker="Skills" %}
+  <dl class="at-ledger">
+    {% for group, skills in skill_groups %}
+    <div class="at-ledger__row"><dt class="at-ledger__key mono-caps">{{ group }}</dt><dd class="at-ledger__body">{% for s in skills %}{{ s.name }}{% if not forloop.last %} · {% endif %}{% endfor %}</dd></div>
+    {% endfor %}
+  </dl>
+{% endwindow %}
+{% endif %}
+
+{% if services %}
+{% window title="services.md" %}
+  {% section_header title="What I can build for you" index="03" kicker="Services" %}
+  <div class="at-grid">
+    {% for service, description_html in services %}
+    <div class="at-service"><h3 class="title">{{ service.title }}</h3>{% if description_html %}<div class="at-prose">{{ description_html }}</div>{% endif %}</div>
+    {% endfor %}
+  </div>
+{% endwindow %}
+{% endif %}
+
+{% if links %}
+{% window title="links.txt" %}
+  <ul class="at-links">{% for link in links %}<li><a href="{{ link.url }}" rel="me noopener">{{ link }}</a></li>{% endfor %}</ul>
+{% endwindow %}
+{% endif %}
+{% endblock %}

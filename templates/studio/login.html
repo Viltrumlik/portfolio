@@ -1,0 +1,25 @@
+{% extends "base.html" %}{% load atlas %}
+{% block title %}Sign in · Studio{% endblock %}
+{% block description %}Sign in to the owner’s studio.{% endblock %}
+{% block meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block body_class %}at-site st-studio st-login{% endblock %}
+{% block cmdk %}{% endblock %}
+{% block body %}
+<main id="main" class="at-page st-login__page">
+  {% window title="studio/login" active=True %}
+    <header class="at-pagehead">
+      <p class="mono-caps">Studio</p>
+      <h1 class="headline">Sign in</h1>
+      <p class="body">Only the owner account can open the studio.</p>
+    </header>
+    <form method="post" action="{{ request.get_full_path }}" class="at-form at-stack">
+      {% csrf_token %}
+      {% include "studio/partials/form_errors.html" %}
+      {% for field in form %}{% include "studio/partials/field.html" %}{% endfor %}
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+      <div class="at-row">{% button "Sign in" type="submit" variant="primary" icon_right="arrow-right" %}</div>
+    </form>
+  {% endwindow %}
+  <p class="mono-sm"><a href="/">Back to the site</a></p>
+</main>
+{% endblock %}

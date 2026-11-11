@@ -1,0 +1,86 @@
+/* Studio: the owner-only screens under /studio/. Layout helpers only; every color, size and radius is a token. */
+
+/* ---- Menu bar extras ------------------------------------------------------------------------- */
+
+.st-logout { display: inline-flex; margin: 0; }
+.st-logout > .at-menubar__link { margin: 0; border: 0; background: none; font: inherit; cursor: pointer; }
+.st-logout > .at-menubar__link:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); border-radius: var(--radius-xs); }
+.st-count {
+  display: inline-grid; place-items: center; min-width: 18px; height: 18px; margin-left: var(--space-1);
+  padding: 0 var(--space-1); box-sizing: border-box; border-radius: var(--radius-pill);
+  background: var(--signal-soft); color: var(--signal); font: 500 10px/1 var(--font-mono); font-variant-numeric: tabular-nums;
+}
+/* The public menu bar drops its nav on phones; the studio has no other way around, so keep it (it scrolls). */
+@media (max-width: 720px) {
+  .st-studio .at-menubar__nav { display: flex; }
+  .st-studio .at-menubar__end > a.at-menubar__link { display: none; }
+}
+
+/* ---- Page layouts ---------------------------------------------------------------------------- */
+
+.st-split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); align-items: start; }
+.st-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: var(--space-5); align-items: start; }
+@media (max-width: 960px) {
+  .st-split { grid-template-columns: minmax(0, 1fr); }
+}
+
+.st-login__page { display: flex; flex-direction: column; gap: var(--space-5); max-width: 520px; }
+
+/* ---- Text helpers ---------------------------------------------------------------------------- */
+
+.st-muted { color: var(--ink-muted); }
+.st-url { overflow-wrap: anywhere; }
+.st-code {
+  padding: 1px var(--space-1); border-radius: var(--radius-xs); background: var(--well); color: var(--ink);
+  font: 400 11px/16px var(--font-mono); overflow-wrap: anywhere;
+}
+.st-prose { font: 400 14px/20px var(--font-sans); color: var(--ink); }
+.st-prose > * { margin: 0 0 var(--space-3); }
+.st-prose > :last-child { margin-bottom: 0; }
+.st-message { max-width: var(--measure); overflow-wrap: anywhere; }
+.st-error { display: flex; align-items: flex-start; gap: var(--space-2); color: var(--danger); font: 400 13px/20px var(--font-sans); overflow-wrap: anywhere; }
+.st-error > .at-icon { margin-top: 3px; }
+
+/* ---- Lists inside windows -------------------------------------------------------------------- */
+
+.st-list { margin: 0; padding: 0; list-style: none; }
+.st-list > li {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+  padding: var(--space-2) 0; border-bottom: 1px dashed var(--edge); font: 500 14px/20px var(--font-sans);
+}
+.st-list > li:last-child { border-bottom: 0; }
+
+/* ---- Forms ----------------------------------------------------------------------------------- */
+
+.st-inline { display: inline-flex; margin: 0; }
+.at-form.st-form--wide { max-width: none; }
+select.at-field__input { cursor: pointer; }
+
+.st-checkfield { display: flex; flex-direction: column; gap: var(--space-1); }
+.st-checks { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; margin: 0; padding: 0; border: 0; }
+.st-checks > legend { margin-bottom: var(--space-2); padding: 0; }
+.st-check { display: inline-flex; align-items: center; gap: var(--space-2); font: 500 14px/20px var(--font-sans); color: var(--ink); cursor: pointer; }
+.st-check__input { flex: none; width: 18px; height: 18px; margin: 0; accent-color: var(--lime); cursor: pointer; }
+.st-check__input:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.st-checkfield--error .at-field__msg { color: var(--danger); }
+
+.st-danger-zone {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3);
+  margin-top: var(--space-5); padding-top: var(--space-4); border-top: 1px dashed var(--edge);
+}
+.st-danger-zone > p { margin: 0; color: var(--ink-muted); }
+
+/* ---- Rule editor: the live template preview -------------------------------------------------- */
+
+.st-preview { display: flex; flex-direction: column; gap: var(--space-2); }
+.st-preview > .mono-caps { margin: var(--space-2) 0 0; }
+.st-preview__out {
+  margin: 0; min-height: 48px; padding: var(--space-3); box-sizing: border-box;
+  border: 1.5px dashed var(--edge); border-radius: var(--radius-sm); background: var(--well); color: var(--ink);
+  font: 400 12px/18px var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere;
+}
+
+/* ---- Automation rules ------------------------------------------------------------------------ */
+
+.st-rule__name { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0; font: 600 16px/22px var(--font-sans); letter-spacing: -0.01em; }
+.st-rule__end { display: inline-flex; align-items: center; gap: var(--space-3); }

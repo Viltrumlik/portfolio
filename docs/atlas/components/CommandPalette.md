@@ -1,0 +1,15 @@
+# CommandPalette
+
+The ⌘K window: one search field over grouped pages, projects and actions, driven entirely from the keyboard.
+
+**Provide:**
+- `groups`: an array of `{ label, items: [{ label, hint, icon, shortcut, keywords }] }`.
+- `onSelect(item)` and `onClose`.
+- Optional: `title`, `placeholder` and `autoFocus`.
+
+Center it over a dimmed desk when it opens from `SiteHeader`.
+
+- **Keys.** ↑/↓ move, ↵ opens and esc closes. Search matches the label, hint and `keywords`.
+- **Group order.** Pages, Projects, Writing, Actions.
+- **Theme switch.** "Switch to the Sage theme" (or Pulse) is always in Actions.
+- **Owner-only actions** ("Open studio") appear only when the owner is signed in.

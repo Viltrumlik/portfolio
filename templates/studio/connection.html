@@ -1,0 +1,37 @@
+{% extends "studio/layout.html" %}{% load atlas %}
+{% block page_title %}{{ card.name }}{% endblock %}
+{% block content %}
+<div class="st-split">
+  {% include "studio/partials/integration_card.html" with win_id="conn-"|add:provider %}
+  {% window title="connections/"|add:provider|add:"/settings" active=True id="connect" label=card.name|add:" settings" %}
+    <form method="post" action="{{ request.path }}" class="at-form at-stack" autocomplete="off">
+      {% csrf_token %}
+      {% include "studio/partials/form_errors.html" %}
+      {% for field in form %}{% include "studio/partials/field.html" %}{% endfor %}
+      <div class="at-row">{% button submit_label type="submit" variant="primary" icon="link" %}</div>
+    </form>
+  {% endwindow %}
+</div>
+
+{% if provider == "github" %}
+{% window title="connections/github/webhook" label="GitHub webhook" %}
+  <div class="st-prose">
+    <p>To get pushes and releases the moment they happen, add a webhook in GitHub (repo or account → Settings → Webhooks).</p>
+    <dl class="at-integ__facts">
+      <dt>Payload URL</dt><dd><code class="st-code">{{ webhook_url }}</code></dd>
+      <dt>Content type</dt><dd>application/json</dd>
+      <dt>Secret</dt><dd>The webhook secret saved above</dd>
+      <dt>Events</dt><dd>push, release</dd>
+    </dl>
+  </div>
+{% endwindow %}
+{% elif provider == "telegram" %}
+{% window title="connections/telegram/chat" label="Telegram chat" %}
+  <div class="st-prose">
+    {% if card.chat_verified %}<p>{% badge "Verified" tone="live" dot=True %} Messages and alerts go to your private chat with {{ card.account }}.</p>
+    {% else %}<p>So the bot can message you, open {{ card.account|default:"the bot" }} in Telegram and send <code class="st-code">/start</code>. Then verify the chat here.</p>{% endif %}
+  </div>
+  {% if card.status != "off" %}<form method="post" action="{% url 'studio:telegram_verify' %}" class="st-inline">{% csrf_token %}{% button "Verify chat" type="submit" icon="check" %}</form>{% endif %}
+{% endwindow %}
+{% endif %}
+{% endblock %}

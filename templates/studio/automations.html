@@ -1,0 +1,19 @@
+{% extends "studio/layout.html" %}{% load atlas %}
+{% block page_title %}Automations{% endblock %}
+{% block content %}
+{% window title="rules/" active=True label="Automations" %}
+  <header class="at-pagehead">
+    <p class="mono-caps">Automations</p>
+    <h1 class="headline">When something happens, then do something</h1>
+    <p class="body">Each rule is one trigger and one action. The switch turns a rule off without deleting it, and new rules start off.</p>
+  </header>
+  <div class="at-row">
+    {% url 'studio:rule_new' as new_url %}{% button "New rule" href=new_url variant="primary" icon="plus" %}
+    {% url 'studio:webhooks' as hooks_url %}{% button "Manage webhooks" href=hooks_url icon_right="arrow-right" %}
+    <span class="mono-sm st-muted">{{ hook_count }} webhook{{ hook_count|pluralize }}</span>
+  </div>
+{% endwindow %}
+<div class="st-grid">
+  {% for card in cards %}{% include "studio/partials/rule_card.html" %}{% endfor %}
+</div>
+{% endblock %}

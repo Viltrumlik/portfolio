@@ -1,0 +1,49 @@
+{% extends "web/layout.html" %}{% load atlas %}
+{% block hero %}
+{% desk height=560 %}
+  {% window title="about.md" active=True id="about" x="3%" y=24 w="46%" delay=0 %}
+    <p class="mono-caps">{{ profile.name }}</p>
+    <h1 class="display-lg">{{ profile.headline|default:profile.name }}</h1>
+    {% if bio_excerpt %}<p class="body-lg">{{ bio_excerpt }}</p>{% endif %}
+    <div class="at-row">
+      {% button "See my work" href="/work/" variant="primary" icon_right="arrow-right" %}
+      {% if profile.cv %}{% button "Download CV" href=profile.cv.url icon_right="arrow-up-right" %}{% endif %}
+    </div>
+  {% endwindow %}
+  {% if has_graph %}
+  {% window title="github.app" id="github" x="52%" y=24 w="45%" delay=100 %}{% contribution_graph %}{% endwindow %}
+  {% endif %}
+  {% now_window id="now" x="52%" y=now_y w="36%" delay=200 %}
+  {% dock dock_items %}
+{% enddesk %}
+{% endblock %}
+
+{% block content %}
+{% if featured %}
+{% window title=work_title %}
+  {% section_header title="Things I built and still maintain" index=idx.work kicker="Selected work" action_label="All projects" action_href="/work/" %}
+  <div class="at-prow-list">{% for p in featured %}{% project_row p index=forloop.counter %}{% endfor %}</div>
+{% endwindow %}
+{% endif %}
+
+{% if pinned_repos or events %}
+{% window title="activity.log" %}
+  {% section_header title="What I have been shipping lately" index=idx.activity kicker="Activity" %}
+  {% if pinned_repos %}<div class="at-grid">{% for repo in pinned_repos %}{% repo_card repo %}{% endfor %}</div>{% endif %}
+  {% activity_feed events label="Recent activity" %}
+{% endwindow %}
+{% endif %}
+
+{% if posts %}
+{% window title="writing/" %}
+  {% section_header title="Notes from building things" index=idx.writing kicker="Writing" action_label="All posts" action_href="/writing/" %}
+  <div class="at-prow-list">{% for post in posts %}{% url 'web:post' post.slug as post_url %}{% project_row title=post.title summary=post.excerpt href=post_url index=forloop.counter stack=post.tags.all meta=post.published_at|date:"M Y" %}{% endfor %}</div>
+{% endwindow %}
+{% endif %}
+
+{% window title="contact.md" id="contact" %}
+  {% section_header title="Have a backend or a bot to build?" index=idx.contact kicker="Contact" %}
+  <p class="body">Write to me here{% if profile.email %} or at <a href="mailto:{{ profile.email }}">{{ profile.email }}</a>{% endif %}. I read every message.</p>
+  {% include "web/partials/contact_form.html" with submit_variant="secondary" %}
+{% endwindow %}
+{% endblock %}

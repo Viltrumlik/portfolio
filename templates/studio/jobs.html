@@ -1,0 +1,28 @@
+{% extends "studio/layout.html" %}{% load atlas %}
+{% block page_title %}Jobs{% endblock %}
+{% block content %}
+{% window title="jobs/failed.log" active=True label="Failed jobs" %}
+  <header class="at-pagehead">
+    <p class="mono-caps">Background jobs</p>
+    <h1 class="headline">Failed jobs</h1>
+    <p class="body">Jobs that ran out of attempts or hit an error retrying can’t fix. Fix the cause, then queue them again.</p>
+  </header>
+  {% if jobs %}
+  <ol class="at-ledger">
+    {% for job in jobs %}
+    <li class="at-ledger__row">
+      <span class="at-ledger__key mono-sm">{% if job.finished_at %}<time datetime="{{ job.finished_at|date:'c' }}">{{ job.finished_at|date:"M j, H:i" }}</time>{% endif %}</span>
+      <div class="at-ledger__body">
+        <p class="title"><code class="st-code">{{ job.kind }}</code> {% badge "Failed" tone="danger" icon="alert" %}</p>
+        {% if job.last_error %}<p class="st-error">{% icon "alert" 14 %}<span>{{ job.last_error }}</span></p>{% endif %}
+        <p class="at-ledger__meta">{{ job.attempts }} attempt{{ job.attempts|pluralize }}</p>
+        <form method="post" action="{% url 'studio:job_retry' job.pk %}" class="st-inline">{% csrf_token %}{% button "Retry" type="submit" size="sm" icon="refresh" %}</form>
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p class="body st-muted">No failed jobs.</p>
+  {% endif %}
+{% endwindow %}
+{% endblock %}

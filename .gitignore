@@ -162,3 +162,12 @@ cython_debug/
 # Local tooling artifacts
 .claude/
 graphify-out/
+
+# Frontend (Vite)
+frontend/node_modules/
+static/dist/
+
+# SQLite WAL side files and the job runner lock
+db.sqlite3-shm
+db.sqlite3-wal
+.run_jobs.lock

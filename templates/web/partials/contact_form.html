@@ -1,0 +1,16 @@
+{% load atlas %}<form method="post" action="{% url 'web:contact' %}" class="at-form at-stack">
+  {% csrf_token %}
+  {% if form.non_field_errors %}<p class="at-note at-note--danger" role="alert">{% icon "alert" 16 %}<span>{{ form.non_field_errors|join:" " }}</span></p>{% endif %}
+  {% for field in form.visible_fields %}{% if field.name != "website" %}
+  <div class="at-field{% if field.errors %} at-field--error{% endif %}">
+    <label class="at-field__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% if field.errors %}<p id="{{ field.id_for_label }}-msg" class="at-field__msg">{% icon "alert" 14 %}<span>{{ field.errors|join:" " }}</span></p>{% endif %}
+  </div>
+  {% endif %}{% endfor %}
+  <div class="at-sr" aria-hidden="true">
+    <label for="{{ form.website.id_for_label }}">Leave this field empty</label>
+    {{ form.website }}
+  </div>
+  <div class="at-row">{% button "Send message" type="submit" variant=submit_variant|default:"primary" icon_right="arrow-right" %}</div>
+</form>

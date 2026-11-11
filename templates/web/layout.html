@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% load atlas %}
+{% block body_class %}at-site{% endblock %}
+{% block body %}
+<a class="at-skip" href="#main">Skip to content</a>
+{% menubar %}
+<main id="main">
+  {% block hero %}{% endblock %}
+  <div class="at-page at-stack">
+    {% block content %}{% endblock %}
+  </div>
+</main>
+<footer class="at-footer">
+  <span class="mono-sm">© {% now "Y" %} {{ profile.name }}</span>
+  <a class="mono-sm" href="{% url 'web:feed' %}">RSS</a>
+  {% button "Switch theme" variant="ghost" size="sm" icon="power" data_theme_toggle=True %}
+</footer>
+{% endblock %}

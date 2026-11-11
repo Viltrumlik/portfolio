@@ -1,0 +1,32 @@
+{% extends "web/layout.html" %}{% load atlas %}
+{% block content %}
+{% window title="projects/"|add:project.slug|add:".md" active=True %}
+  <header class="at-pagehead">
+    <p class="mono-caps">{% if project.kind %}{{ project.kind }}{% else %}Project{% endif %}{% if repo.language %} · {{ repo.language }}{% endif %}</p>
+    <h1 class="display-lg">{{ project.display_title }}</h1>
+    {% if project.summary %}<p class="body-lg">{{ project.summary }}</p>{% elif repo.description %}<p class="body-lg">{{ repo.description }}</p>{% endif %}
+    {% if project.stack %}<p class="mono-sm">{{ project.stack|join:" · " }}</p>{% endif %}
+  </header>
+  <div class="at-row">
+    {% button "View on GitHub" href=repo_url variant="primary" icon_right="arrow-up-right" %}
+    {% if repo.homepage %}{% button "Open live site" href=repo.homepage icon_right="arrow-up-right" %}{% endif %}
+    {% button "All projects" href="/work/" variant="ghost" icon_right="arrow-right" %}
+  </div>
+{% endwindow %}
+
+{% if repo %}
+{% window title="repo.stats" %}
+  <div class="at-stats">
+    {% stat value=repo.stars label="Stars" %}
+    {% stat value=repo.forks label="Forks" %}
+    {% if updated %}{% stat value=updated label="Last push" %}{% endif %}
+  </div>
+{% endwindow %}
+{% endif %}
+
+{% if case_study_html %}
+{% window title="case-study.md" %}
+  <article class="at-prose">{{ case_study_html }}</article>
+{% endwindow %}
+{% endif %}
+{% endblock %}

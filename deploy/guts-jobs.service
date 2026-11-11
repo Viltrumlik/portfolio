@@ -1,0 +1,14 @@
+# Runs due background jobs (syncs, webhooks, automation rules) once; started by guts-jobs.timer.
+[Unit]
+Description=Atlas portfolio background jobs (guts.uz)
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=guts
+Group=www-data
+WorkingDirectory=/home/viltrumlik/portfolio
+EnvironmentFile=/home/viltrumlik/portfolio/.env
+ExecStart=/home/viltrumlik/portfolio/.venv/bin/python manage.py run_jobs
+TimeoutStartSec=90
+Nice=10

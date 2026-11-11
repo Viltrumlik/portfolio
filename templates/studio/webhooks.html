@@ -1,0 +1,41 @@
+{% extends "studio/layout.html" %}{% load atlas %}
+{% block page_title %}Webhooks{% endblock %}
+{% block content %}
+{% window title="webhooks/" active=True label="Outgoing webhooks" %}
+  <header class="at-pagehead">
+    <p class="mono-caps">{% service_code "WH" "Outgoing webhook" "sm" %} Automations</p>
+    <h1 class="headline">Outgoing webhooks</h1>
+    <p class="body">Signed events sent to n8n, Make or Zapier. Each delivery carries <code class="st-code">X-Atlas-Signature</code> (HMAC-SHA256 of the body).</p>
+  </header>
+  {% if rows %}
+  <ol class="at-ledger">
+    {% for row in rows %}
+    <li class="at-ledger__row">
+      <span class="at-ledger__key">{% if row.hook.is_active %}{% badge "On" tone="live" dot=True %}{% else %}{% badge "Paused" %}{% endif %}</span>
+      <div class="at-ledger__body">
+        <h2 class="title">{{ row.hook.name }}</h2>
+        <p class="mono-sm st-url">{{ row.hook.url }}</p>
+        <p class="at-ledger__meta">{% if row.hook.events %}{{ row.hook.events|join:", " }}{% else %}No events; only rules send here.{% endif %}</p>
+        <p class="at-ledger__meta">Secret {{ row.secret|default:"not set" }}{% if row.last %} · Last delivery {{ row.last }}{% endif %}</p>
+        <div class="at-row">
+          <form method="post" action="{% url 'studio:webhook_test' row.hook.pk %}" class="st-inline">{% csrf_token %}{% button "Send test" type="submit" size="sm" icon="zap" %}</form>
+          {% url 'studio:webhook' row.hook.pk as edit_url %}{% button "Edit" href=edit_url variant="ghost" size="sm" %}
+        </div>
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p class="body st-muted">No webhooks yet. Add one below.</p>
+  {% endif %}
+{% endwindow %}
+
+{% window title="webhooks/new" id="new" label="New webhook" %}
+  <form method="post" action="{% url 'studio:webhooks' %}" class="at-form at-stack" autocomplete="off">
+    {% csrf_token %}
+    {% include "studio/partials/form_errors.html" %}
+    {% for field in form %}{% include "studio/partials/field.html" %}{% endfor %}
+    <div class="at-row">{% button "Add webhook" type="submit" variant="primary" icon="plus" %}</div>
+  </form>
+{% endwindow %}
+{% endblock %}

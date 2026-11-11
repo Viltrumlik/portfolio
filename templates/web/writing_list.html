@@ -1,0 +1,22 @@
+{% extends "web/layout.html" %}{% load atlas %}
+{% block content %}
+{% window title=tag|yesno:"writing/tags/,writing/" active=True %}
+  <header class="at-pagehead">
+    <p class="mono-caps">Writing</p>
+    <h1 class="display-lg">{{ heading }}</h1>
+    <p class="body-lg">{{ posts|length }} post{{ posts|length|pluralize }}. <a href="{% url 'web:feed' %}">Follow by RSS</a>.</p>
+  </header>
+  {% if tags %}
+  <nav class="at-row" aria-label="Tags">
+    {% for t in tags %}{% url 'web:tag' t.slug as tag_url %}{% button t.name href=tag_url variant="ghost" size="sm" %}{% endfor %}
+  </nav>
+  {% elif tag %}
+  <div class="at-row">{% button "All posts" href="/writing/" variant="ghost" size="sm" icon_right="arrow-right" %}</div>
+  {% endif %}
+  {% if posts %}
+  <div class="at-prow-list">{% for post in posts %}{% url 'web:post' post.slug as post_url %}{% project_row title=post.title summary=post.excerpt href=post_url index=forloop.counter stack=post.tags.all meta=post.published_at|date:"M j, Y" %}{% endfor %}</div>
+  {% else %}
+  <p class="body">Nothing published yet.</p>
+  {% endif %}
+{% endwindow %}
+{% endblock %}

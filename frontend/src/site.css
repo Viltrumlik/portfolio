@@ -1,0 +1,224 @@
+/* Page-level styles for the server-rendered site: the classes the Django templates emit that the Atlas
+   component sheet does not cover. Tokens only. Signal text appears only inside windows; on the desk,
+   text is ink or ink-muted. */
+
+/* The hidden attribute always wins (e.g. over .at-now__row { display: grid }). */
+[hidden] { display: none !important; }
+
+/* ---- Links ----------------------------------------------------------------------------------- */
+
+/* On the desk (footer, skip link, anything outside a window): ink, never browser blue. */
+a { color: inherit; }
+
+/* Plain links inside windows: the link color, underlined. Components (buttons, rows, cards) have classes. */
+.at-win__body a:not([class]),
+.at-prose a:not(.at-btn) {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+.at-win__body a:not([class]):hover,
+.at-prose a:not(.at-btn):hover { text-decoration-thickness: 2px; }
+a:not([class]):focus-visible,
+.at-prose a:focus-visible,
+.at-footer a:focus-visible {
+  outline: 2px solid transparent;
+  border-radius: var(--radius-xs);
+  box-shadow: var(--focus-ring);
+}
+
+/* ---- Skip link ------------------------------------------------------------------------------- */
+
+.at-skip {
+  position: absolute; top: var(--space-2); left: var(--space-4); z-index: 3000;
+  padding: var(--space-2) var(--space-4);
+  border: 1.5px solid var(--lime-edge); border-radius: var(--radius-pill);
+  background: var(--lime); color: var(--on-lime);
+  font: 600 13px/18px var(--font-sans); text-decoration: none;
+  transform: translateY(calc(-100% - var(--space-4)));
+}
+.at-skip:focus { transform: none; outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+
+/* ---- Page frame ------------------------------------------------------------------------------ */
+
+main:focus { outline: none; }
+
+.at-page {
+  box-sizing: border-box; width: 100%;
+  max-width: calc(var(--container-max) + 2 * var(--space-6));
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-6) 0;
+  gap: var(--space-8);
+}
+.at-page > .at-win { min-width: 0; }
+
+.at-footer {
+  box-sizing: border-box; width: 100%;
+  max-width: calc(var(--container-max) + 2 * var(--space-6));
+  margin: var(--space-9) auto 0;
+  padding: var(--space-5) var(--space-6) var(--space-6);
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-5);
+  color: var(--ink-muted);
+}
+.at-footer a { color: var(--ink); text-decoration: none; }
+.at-footer a:not(.at-btn):hover { text-decoration: underline; text-underline-offset: 0.2em; }
+.at-footer > .at-btn { margin-left: auto; }
+
+/* ---- Window bodies: vertical rhythm ---------------------------------------------------------- */
+
+.at-win__body > :first-child { margin-top: 0; }
+.at-win__body > :last-child { margin-bottom: 0; }
+:is(.at-page, .at-desk) > .at-win > .at-win__body > :is(.at-section, .at-pagehead, .at-row, .at-grid, .at-prow-list,
+  .at-feed, .at-prose, .at-note, .at-ledger, .at-stats, .at-links, .at-article, nav, form, p)
+  + :is(.at-row, .at-grid, .at-prow-list, .at-feed, .at-prose, .at-note, .at-ledger, .at-stats, .at-links, nav, form, p) {
+  margin-top: var(--space-5);
+}
+
+/* Page heading block at the top of a page window. */
+.at-pagehead { display: flex; flex-direction: column; gap: var(--space-3); padding-bottom: var(--space-2); }
+.at-pagehead > * { margin: 0; }
+.at-pagehead > .mono-caps { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--ink-muted); }
+.at-pagehead > h1 { text-wrap: balance; }
+.at-pagehead > .body-lg { max-width: var(--measure); }
+.at-pagehead > .mono-sm { color: var(--ink-muted); }
+
+/* Hero about window on the desk: same structure without a header wrapper. */
+.at-desk .at-win__body > .mono-caps { margin-bottom: var(--space-3); color: var(--ink-muted); }
+.at-desk .at-win__body > h1 { margin: 0 0 var(--space-4); text-wrap: balance; }
+.at-desk .at-win__body > .body-lg { margin: 0 0 var(--space-5); }
+
+/* ---- Lists of rows, stats, links ------------------------------------------------------------- */
+
+.at-prow-list { display: flex; flex-direction: column; }
+.at-prow-list > .at-prow:last-child { border-bottom: 0; }
+
+.at-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--space-5); }
+
+.at-links {
+  display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5);
+  margin: 0; padding: 0; list-style: none;
+  font: 500 14px/20px var(--font-sans);
+}
+
+/* ---- Ledger: key / value rows separated by dashed lines -------------------------------------- */
+
+.at-ledger { margin: 0; padding: 0; list-style: none; }
+.at-ledger__row {
+  display: grid; grid-template-columns: minmax(0, 180px) minmax(0, 1fr); gap: var(--space-2) var(--space-5);
+  align-items: baseline; padding: var(--space-4) 0; border-bottom: 1px dashed var(--edge);
+}
+.at-ledger__row:first-child { padding-top: 0; }
+.at-ledger__row:last-child { border-bottom: 0; padding-bottom: 0; }
+.at-ledger__key { color: var(--ink-muted); }
+.at-ledger__body { min-width: 0; margin: 0; font: 400 16px/24px var(--font-sans); color: var(--ink); }
+.at-ledger__body > * { margin: 0; }
+.at-ledger__body > * + * { margin-top: var(--space-2); }
+.at-ledger__body > .at-prose { margin-top: var(--space-3); }
+.at-ledger__meta { font: 400 14px/20px var(--font-sans); color: var(--ink-muted); }
+
+/* ---- Service cards --------------------------------------------------------------------------- */
+
+.at-service {
+  display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-4);
+  border: 1.5px solid var(--edge); border-radius: var(--radius-md); background: var(--window);
+}
+.at-service > * { margin: 0; }
+.at-service .at-prose { font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+
+/* ---- Notes ----------------------------------------------------------------------------------- */
+
+.at-note {
+  display: flex; align-items: flex-start; gap: var(--space-2); margin: 0;
+  padding: var(--space-3) var(--space-4); box-sizing: border-box; max-width: var(--measure);
+  border: 1.5px solid var(--lime-edge); border-radius: var(--radius-sm);
+  background: var(--lime); color: var(--on-lime); box-shadow: var(--shadow-sm);
+  font: 600 14px/20px var(--font-sans);
+}
+.at-note > .at-icon { margin-top: 2px; }
+.at-note--danger { background: var(--danger-soft); color: var(--danger); border-color: var(--danger); box-shadow: none; }
+
+/* ---- Forms ----------------------------------------------------------------------------------- */
+
+.at-form { max-width: 560px; }
+.at-form .at-field { max-width: none; }
+textarea.at-field__input {
+  height: auto; min-height: 144px; padding: var(--space-2) var(--space-3);
+  line-height: 24px; resize: vertical;
+}
+
+/* ---- Error window (404) ---------------------------------------------------------------------- */
+
+.at-win--error > .at-win__bar,
+.at-win--error.is-active > .at-win__bar { background: var(--danger-soft); color: var(--danger); border-bottom-color: var(--edge); }
+.at-win--error .at-pagehead > .mono-caps { color: var(--danger); }
+
+/* ---- Long-form Markdown ---------------------------------------------------------------------- */
+
+.at-article { max-width: var(--measure); margin-inline: auto; padding-block: var(--space-4); }
+.at-article > .at-pagehead { margin-bottom: var(--space-7); }
+.at-article + .at-row { max-width: var(--measure); margin-inline: auto; }
+
+.at-prose { max-width: var(--measure); font: 400 16px/24px var(--font-sans); color: var(--ink); overflow-wrap: break-word; }
+.at-prose > * { margin: 0; }
+.at-prose > * + * { margin-top: var(--space-4); }
+.at-prose h2 { margin-top: var(--space-7); font: 700 32px/34px var(--font-sans); letter-spacing: -0.03em; text-wrap: balance; }
+.at-prose h3 { margin-top: var(--space-6); font: 600 20px/26px var(--font-sans); letter-spacing: -0.015em; }
+.at-prose h4 { margin-top: var(--space-5); font: 600 16px/24px var(--font-sans); }
+.at-prose :is(h2, h3, h4) + * { margin-top: var(--space-3); }
+.at-prose > :first-child { margin-top: 0; }
+.at-prose strong { font-weight: 700; }
+.at-prose ul, .at-prose ol { padding-left: var(--space-5); }
+.at-prose li + li { margin-top: var(--space-2); }
+.at-prose li > :is(ul, ol) { margin-top: var(--space-2); }
+.at-prose li::marker { color: var(--ink-muted); }
+.at-prose code {
+  padding: 1px var(--space-1); box-sizing: border-box;
+  border: 1px solid var(--edge); border-radius: var(--radius-xs); background: var(--well);
+  font: 400 0.75em/1 var(--font-mono);
+}
+.at-prose pre {
+  overflow-x: auto; padding: var(--space-4);
+  border: 1.5px solid var(--edge); border-radius: var(--radius-sm); background: var(--well);
+  font: 400 12px/18px var(--font-mono); tab-size: 2;
+}
+.at-prose pre code { padding: 0; border: 0; background: none; font: inherit; }
+.at-prose blockquote { padding-left: var(--space-4); border-left: 3px solid var(--signal); color: var(--ink-muted); }
+.at-prose blockquote > * { margin: 0; }
+.at-prose blockquote > * + * { margin-top: var(--space-3); }
+.at-prose img {
+  display: block; max-width: 100%; height: auto; box-sizing: border-box;
+  border: 1.5px solid var(--edge); border-radius: var(--radius-sm);
+}
+.at-prose hr { height: 0; border: 0; border-top: 1px dashed var(--edge); margin-block: var(--space-6); }
+.at-prose table {
+  display: block; max-width: 100%; overflow-x: auto;
+  border-collapse: collapse; font: 400 14px/20px var(--font-sans);
+}
+.at-prose th, .at-prose td { padding: var(--space-2) var(--space-3); border-bottom: 1px dashed var(--edge); text-align: left; vertical-align: top; }
+.at-prose th { font: 500 10px/14px var(--font-mono); letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-muted); border-bottom-style: solid; }
+.at-prose :is(th, td)[align="right"] { text-align: right; }
+.at-prose :is(th, td)[align="center"] { text-align: center; }
+.at-prose tr:last-child td { border-bottom: 0; }
+
+/* ---- Narrow desktops and tablets: stack the desk below 1024px --------------------------------- */
+/* components.css stacks it under 720px; between 720 and 1023px the hero windows no longer fit side by side
+   on a fixed-height desk. Desk drag (islands/desk.ts) follows this automatically: it only drags windows
+   that are absolutely positioned. */
+@media (max-width: 1023px) {
+  .at-desk { height: auto; display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-6); }
+  .at-desk > .at-win { position: static; width: auto; }
+  .at-desk > .at-win > .at-win__bar { cursor: default; }
+  .at-desk > .at-dock { position: sticky; bottom: var(--space-4); left: auto; transform: none; align-self: center; }
+}
+
+/* ---- Phones ---------------------------------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .at-desk { padding: var(--space-5); }
+  .at-page { padding: var(--space-5) var(--space-5) 0; gap: var(--space-6); }
+  .at-footer { margin-top: var(--space-8); padding: var(--space-5); }
+  /* display-lg steps down to the headline style on phones */
+  :is(.at-pagehead, .at-desk .at-win__body) > .display-lg { font-size: 32px; line-height: 34px; letter-spacing: -0.03em; }
+  .at-ledger__row { grid-template-columns: minmax(0, 1fr); }
+}

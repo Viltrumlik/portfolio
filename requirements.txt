@@ -1,7 +1,5 @@
 Django==5.2.10
-django-extensions==4.1
 markdown==3.10.2
-django-summernote==0.8.20.0
 bleach==6.3.0
 webencodings==0.5.1
 gunicorn==23.0.0
@@ -9,3 +7,5 @@ whitenoise==6.9.0
 python-dotenv==1.0.1
 django-unfold==0.80.2
 Pillow==11.0.0
+httpx==0.28.1
+cryptography==44.0.0

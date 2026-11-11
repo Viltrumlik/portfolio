@@ -1,0 +1,27 @@
+{% extends "studio/layout.html" %}{% load atlas %}
+{% block page_title %}{{ heading }} · Content{% endblock %}
+{% block content %}
+{% window title=window_title active=True label=heading %}
+  <header class="at-pagehead">
+    <p class="mono-caps"><a href="{% url 'studio:content' %}">Content</a></p>
+    <h1 class="headline">{{ heading }}</h1>
+    {% if intro %}<p class="body">{{ intro }}</p>{% endif %}
+  </header>
+  {% if new_url %}<div class="at-row">{% button new_label href=new_url variant="primary" icon="plus" %}</div>{% endif %}
+  {% if rows %}
+  <ol class="at-ledger">
+    {% for row in rows %}
+    <li class="at-ledger__row">
+      <span class="at-ledger__key mono-sm">{{ row.key }}</span>
+      <div class="at-ledger__body">
+        <p class="title"><a href="{{ row.href }}">{{ row.title }}</a>{% if row.badge %} {% badge row.badge.label tone=row.badge.tone %}{% endif %}</p>
+        {% if row.meta %}<p class="at-ledger__meta">{{ row.meta }}</p>{% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p class="body st-muted">{{ empty }}</p>
+  {% endif %}
+{% endwindow %}
+{% endblock %}

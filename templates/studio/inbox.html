@@ -1,0 +1,30 @@
+{% extends "studio/layout.html" %}{% load atlas %}
+{% block page_title %}Inbox{% endblock %}
+{% block content %}
+{% window title="inbox/" active=True label="Inbox" %}
+  <header class="at-pagehead">
+    <p class="mono-caps">{% service_code "ST" "This site" "sm" %} Contact form</p>
+    <h1 class="headline">Inbox</h1>
+  </header>
+  {% if items %}
+  <ol class="at-ledger">
+    {% for item in items %}
+    <li class="at-ledger__row">
+      <span class="at-ledger__key mono-sm"><time datetime="{{ item.created_at|date:'c' }}">{{ item.created_at|date:"M j, H:i" }}</time></span>
+      <div class="at-ledger__body">
+        <p class="title">{{ item.name }} {% if not item.is_read %}{% badge "Unread" tone="accent" dot=True %}{% endif %}</p>
+        <p class="at-ledger__meta"><a href="mailto:{{ item.email }}">{{ item.email }}</a></p>
+        <p class="st-message">{{ item.message|linebreaksbr }}</p>
+        <div class="at-row">
+          {% if not item.is_read %}<form method="post" action="{% url 'studio:inbox_read' item.pk %}" class="st-inline">{% csrf_token %}{% button "Mark read" type="submit" size="sm" icon="check" %}</form>{% endif %}
+          <form method="post" action="{% url 'studio:inbox_delete' item.pk %}" class="st-inline">{% csrf_token %}{% button "Delete" type="submit" variant="ghost" size="sm" icon="x" %}</form>
+        </div>
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p class="body st-muted">No messages yet.</p>
+  {% endif %}
+{% endwindow %}
+{% endblock %}
