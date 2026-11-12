@@ -110,3 +110,8 @@ jobs:
             echo "$path -> $code"
             [ "$code" = 200 ]
           done
+          # nginx serves the stylesheet from disk: a permissions mistake shows up here, not on the pages.
+          asset=$(curl -s --max-time 15 https://viltrumlik.uz/ | grep -o '/static/[^"]*\.css' | head -1)
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "https://viltrumlik.uz$asset")
+          echo "$asset -> $code"
+          [ -n "$asset" ] && [ "$code" = 200 ]

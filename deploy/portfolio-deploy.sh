@@ -66,11 +66,17 @@ sudo -u "$OWNER" "$APP/.venv/bin/python" -c \
   "$APP/db.sqlite3" "$db_backup"
 
 healthy() {
-  local path code
+  local path code asset
   for path in $HEALTH_PATHS; do
     code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 --resolve "$SITE:443:127.0.0.1" "https://$SITE$path" || true)
     [[ "$code" == 200 ]] || { log "health: $path -> $code"; return 1; }
   done
+  # The home page's own stylesheet must load too. nginx serves it straight from disk, so this catches
+  # file-permission mistakes that the HTML pages (served by gunicorn) never show.
+  asset=$(curl -s --max-time 10 --resolve "$SITE:443:127.0.0.1" "https://$SITE/" | grep -o '/static/[^"]*\.css' | head -1 || true)
+  [[ -n "$asset" ]] || { log "health: no stylesheet linked from /"; return 1; }
+  code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 --resolve "$SITE:443:127.0.0.1" "https://$SITE$asset" || true)
+  [[ "$code" == 200 ]] || { log "health: $asset -> $code"; return 1; }
 }
 
 wait_healthy() {
@@ -93,6 +99,7 @@ rollback() {
   install -o "$OWNER" -g "$OWNER" -m 644 "$db_backup" "$APP/db.sqlite3"
   echo "$previous" > "$APP/REVISION"
   chown -R "$OWNER:$OWNER" "$APP"
+  chmod 755 "$APP"
   systemctl start "$SOCKET" "$SERVICE"
   if wait_healthy; then log "rolled back; the site is up on $previous"; else log "rolled back, but the site is STILL unhealthy"; fi
 }
@@ -104,6 +111,8 @@ deploy() {
   step "syncing files" rsync -a --no-owner --no-group --delete "${RSYNC_PROTECT[@]}" "$release/" "$APP/" || return 1
   echo "$revision" > "$APP/REVISION"
   step "fixing ownership" chown -R "$OWNER:$OWNER" "$APP" || return 1
+  # nginx (www-data) must be able to enter the app dir to serve /static/ and /media/.
+  step "fixing permissions" chmod 755 "$APP" || return 1
   step "installing requirements" sudo -u "$OWNER" "$APP/.venv/bin/pip" install -q --disable-pip-version-check -r "$APP/requirements.txt" || return 1
   step "migrating" manage migrate --noinput || return 1
   # No --clear: pages already open in a browser keep their old hashed assets.
