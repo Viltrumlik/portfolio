@@ -255,6 +255,9 @@ a.at-ls__row:focus-visible { outline: 2px solid transparent; box-shadow: var(--f
 .at-cfg { margin: 0; font: 400 12px/20px var(--font-mono); color: var(--ink); white-space: pre-wrap; }
 .at-cfg__sec { color: var(--signal); font-weight: 700; text-shadow: var(--text-glow); }
 
+/* now.app sits in a narrow column: let the availability badge drop under the clock instead of overflowing. */
+.at-now__head { flex-wrap: wrap; row-gap: var(--space-2); }
+
 /* Pictures: thumbnails in project and post lists, screenshots on detail pages. */
 .at-prow--media { grid-template-columns: 40px 168px minmax(0, 1fr) minmax(0, 200px) 96px; align-items: center; }
 .at-prow__thumb {
