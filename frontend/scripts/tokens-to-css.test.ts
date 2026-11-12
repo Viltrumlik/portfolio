@@ -105,10 +105,14 @@ describe('tokensToCss', () => {
   it('converts the real tokens.json without leftover aliases', () => {
     const real = JSON.parse(readFileSync(new URL('../src/atlas/tokens.json', import.meta.url), 'utf8'));
     const out = tokensToCss(real);
-    expect(block(out, ':root, [data-theme="dark"]')).toContain('--desk: #0c0d0f;');
-    expect(block(out, '[data-theme="light"]')).toContain('--desk: #b7c6ad;');
+    expect(block(out, ':root, [data-theme="green"]')).toContain('--desk: #010802;');
+    expect(block(out, ':root, [data-theme="green"]')).toContain('--phosphor: #00ff41;');
+    expect(block(out, '[data-theme="amber"]')).toContain('--phosphor: #ffb000;');
+    expect(block(out, '[data-theme="ice"]')).toContain('--phosphor: #5ee7ff;');
+    for (const theme of ['amber', 'ice']) expect(block(out, `[data-theme="${theme}"]`)).toContain('color-scheme: dark;');
     expect(out).toContain('--link: var(--signal);');
-    expect(out).toContain('--focus-ring: 0 0 0 2px #0c0d0f, 0 0 0 4px #c5f82a;');
+    expect(out).toContain('--focus-ring: 0 0 0 2px var(--desk), 0 0 0 4px var(--phosphor);');
+    expect(out).toContain('--font-display: "VT323"');
     expect(out).toContain('.body-sm {');
     expect(out).not.toMatch(/\{[a-z-]+\}/);
   });

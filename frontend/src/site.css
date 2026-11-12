@@ -1,4 +1,4 @@
-/* Page-level styles for the server-rendered site: the classes the Django templates emit that the Atlas
+/* Page-level styles for the server-rendered Matrix site: the classes the Django templates emit that the Atlas
    component sheet does not cover. Tokens only. Signal text appears only inside windows; on the desk,
    text is ink or ink-muted. */
 
@@ -33,9 +33,9 @@ a:not([class]):focus-visible,
 .at-skip {
   position: absolute; top: var(--space-2); left: var(--space-4); z-index: 3000;
   padding: var(--space-2) var(--space-4);
-  border: 1.5px solid var(--lime-edge); border-radius: var(--radius-pill);
+  border: 1px solid var(--lime-edge); border-radius: var(--radius-xs);
   background: var(--lime); color: var(--on-lime);
-  font: 600 13px/18px var(--font-sans); text-decoration: none;
+  font: 700 12px/18px var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
   transform: translateY(calc(-100% - var(--space-4)));
 }
 .at-skip:focus { transform: none; outline: 2px solid transparent; box-shadow: var(--focus-ring); }
@@ -162,9 +162,10 @@ textarea.at-field__input {
 .at-prose { max-width: var(--measure); font: 400 16px/24px var(--font-sans); color: var(--ink); overflow-wrap: break-word; }
 .at-prose > * { margin: 0; }
 .at-prose > * + * { margin-top: var(--space-4); }
-.at-prose h2 { margin-top: var(--space-7); font: 700 32px/34px var(--font-sans); letter-spacing: -0.03em; text-wrap: balance; }
-.at-prose h3 { margin-top: var(--space-6); font: 600 20px/26px var(--font-sans); letter-spacing: -0.015em; }
-.at-prose h4 { margin-top: var(--space-5); font: 600 16px/24px var(--font-sans); }
+.at-prose h2 { margin-top: var(--space-7); font: 400 44px/40px var(--font-display); color: var(--signal); text-shadow: var(--text-glow); text-wrap: balance; }
+.at-prose h3 { margin-top: var(--space-6); font: 700 17px/24px var(--font-mono); color: var(--signal); }
+.at-prose h3::before { content: "## "; color: var(--phosphor-dim); }
+.at-prose h4 { margin-top: var(--space-5); font: 700 15px/24px var(--font-mono); }
 .at-prose :is(h2, h3, h4) + * { margin-top: var(--space-3); }
 .at-prose > :first-child { margin-top: 0; }
 .at-prose strong { font-weight: 700; }
@@ -175,7 +176,7 @@ textarea.at-field__input {
 .at-prose code {
   padding: 1px var(--space-1); box-sizing: border-box;
   border: 1px solid var(--edge); border-radius: var(--radius-xs); background: var(--well);
-  font: 400 0.75em/1 var(--font-mono);
+  font: 400 0.9em/1 var(--font-mono); color: var(--signal);
 }
 .at-prose pre {
   overflow-x: auto; padding: var(--space-4);
@@ -201,13 +202,82 @@ textarea.at-field__input {
 .at-prose :is(th, td)[align="center"] { text-align: center; }
 .at-prose tr:last-child td { border-bottom: 0; }
 
+/* ---- Matrix layers --------------------------------------------------------------------------- */
+/* The digital rain canvas (fx.css) sits at z-index 0; page content stacks above it. */
+.at-site main, .at-site .at-footer { position: relative; z-index: 1; }
+
+/* Reading windows (articles, the about page) are nearly opaque so text never fights the rain. */
+.at-page > .at-win:has(.at-article, .at-prose, .at-ledger) { background: color-mix(in srgb, var(--desk) 95%, transparent); }
+
+/* ---- The dense home desk ---------------------------------------------------------------------- */
+/* Each desk window gets its height from web/desk.py; the body scrolls if its content runs long. */
+.at-desk > .at-win { height: var(--h, auto); }
+.at-desk > .at-win > .at-win__body {
+  overflow: auto; container-type: inline-size;
+  scrollbar-width: thin; scrollbar-color: var(--edge-strong) transparent;
+}
+
+/* about.sys: the handle, decoded, in VT323. */
+.at-name { margin: 0 0 var(--space-2); font-size: clamp(56px, 6vw, 96px); line-height: 0.86; text-transform: uppercase; overflow-wrap: anywhere; }
+.at-tagline { margin: 0 0 var(--space-2); color: var(--ink); }
+.at-muted { color: var(--ink-muted); }
+.at-desk .at-win__body > .body-sm { margin: 0 0 var(--space-4); }
+
+/* terminal — tty1 */
+.at-termwin > .at-win__body { background: color-mix(in srgb, var(--desk) 60%, transparent); }
+.at-term {
+  margin: 0; font: 400 12.5px/20px var(--font-mono); color: var(--signal); text-shadow: var(--text-glow);
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+
+/* `ls -la` listings: projects/ and links.sh */
+.at-ls { margin: 0; padding: 0; list-style: none; font: 400 12px/24px var(--font-mono); }
+.at-ls__row {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--space-3);
+  padding: 0 var(--space-1); color: var(--ink); text-decoration: none;
+}
+.at-ls__perm { color: var(--phosphor-dim); }
+.at-ls__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.at-ls__meta { max-width: 18ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-muted); }
+a.at-ls__row:hover { background: var(--signal-soft); color: var(--signal); text-shadow: var(--text-glow); }
+a.at-ls__row:hover .at-ls__perm { color: var(--signal); }
+a.at-ls__row:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.at-ls__more {
+  display: inline-block; margin-top: var(--space-2); color: var(--signal); text-decoration: none; text-shadow: var(--text-glow);
+  font: 700 11px/16px var(--font-mono); letter-spacing: 0.08em;
+}
+.at-ls__more:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+@container (max-width: 320px) {
+  .at-ls__perm { display: none; }
+}
+
+/* stack.cfg */
+.at-cfg { margin: 0; font: 400 12px/20px var(--font-mono); color: var(--ink); white-space: pre-wrap; }
+.at-cfg__sec { color: var(--signal); font-weight: 700; text-shadow: var(--text-glow); }
+
+/* sys.info */
+.at-sysinfo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-4); }
+.at-sysinfo .at-stat { padding-top: var(--space-2); }
+
+/* Menu bar: the sound toggle */
+.at-menubar__sound {
+  padding: 0; border: 0; background: none; color: var(--ink-muted); cursor: pointer;
+  font: inherit; letter-spacing: inherit; text-transform: inherit;
+}
+.at-menubar__sound::before { content: "♪ "; }
+.at-menubar__sound:hover, .at-menubar__sound[aria-pressed="true"] { color: var(--signal); text-shadow: var(--text-glow); }
+@media (max-width: 720px) {
+  .at-menubar__sound { display: none; }
+}
+
 /* ---- Narrow desktops and tablets: stack the desk below 1024px --------------------------------- */
 /* components.css stacks it under 720px; between 720 and 1023px the hero windows no longer fit side by side
    on a fixed-height desk. Desk drag (islands/desk.ts) follows this automatically: it only drags windows
    that are absolutely positioned. */
 @media (max-width: 1023px) {
   .at-desk { height: auto; display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-6); }
-  .at-desk > .at-win { position: static; width: auto; }
+  .at-desk > .at-win { position: static; width: auto; height: auto; }
+  .at-desk > .at-win > .at-win__body { overflow: visible; }
   .at-desk > .at-win > .at-win__bar { cursor: default; }
   .at-desk > .at-dock { position: sticky; bottom: var(--space-4); left: auto; transform: none; align-self: center; }
 }

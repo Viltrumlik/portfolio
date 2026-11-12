@@ -9,7 +9,7 @@ def test_server_error_handler_renders_atlas_error_window():
     response = server_error(RequestFactory().get("/boom/"))
     html = response.content.decode()
     assert response.status_code == 500
-    assert '<html lang="en" data-theme="dark">' in html
+    assert '<html lang="en" data-theme="green">' in html
     assert '<section class="at-win at-win--error is-active" aria-label="errors/500.log">' in html
     assert '<span class="at-win__title">errors/500.log</span>' in html
     assert "Error 500" in html and 'href="/"' in html

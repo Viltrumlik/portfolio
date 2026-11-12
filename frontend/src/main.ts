@@ -3,6 +3,7 @@ import './atlas/components.css';
 import './islands.css';
 import './site.css';
 import './studio.css';
+import './fx/fx.css';
 import { boot } from './boot';
 
 if (document.readyState === 'loading') {
