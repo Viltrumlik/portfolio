@@ -1,6 +1,6 @@
 # Kbd
 
-A keyboard key: Martian Mono in a `well`, with a thin `edge` outline.
+A keyboard key: JetBrains Mono in `signal` on a `well`, with a thin `edge-strong` outline.
 
 **Provide:** one key as `children` ("⌘", "K", "esc", "↵"). Use one `Kbd` per key and set them side by side for a chord.
 

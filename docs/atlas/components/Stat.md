@@ -1,6 +1,6 @@
 # Stat
 
-A single number with its label, set in Martian Mono with tabular figures over an `edge` hairline.
+A single number with its label: the number in glowing VT323 with tabular figures, over a dashed `edge` line.
 
 **Provide:** `value` (a formatted string) and `label`. Optional: `unit`, `delta` and `trend: 'down'`.
 

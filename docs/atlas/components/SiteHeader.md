@@ -1,6 +1,6 @@
 # SiteHeader
 
-The menu bar across the top: a lime square and the site name, primary links, live availability, the owner's local time, and a ⌘K button.
+The sticky menu bar across the top: the site name in glowing VT323 with a blinking block cursor after it, `/`-prefixed links, live availability, the owner's local time, and a ⌘K button. On the site it also carries the sound toggle.
 
 **Provide:**
 - `name` (e.g. "alisher.os").
@@ -10,6 +10,6 @@ The menu bar across the top: a lime square and the site name, primary links, liv
 - `onCommand`, to open the `CommandPalette`.
 - `homeHref`.
 
-- **Active link.** Mark one link active. It gets a 2px `signal` underline and `aria-current="page"`.
+- **Active link.** Mark one link active. It turns `signal`, its `/` becomes `>`, and it gets `aria-current="page"`.
 - **Phones.** Under 720px the links and status hide, so ⌘K must list every page.
 - **Status.** Keep it honest: change it from the studio, or leave it out.

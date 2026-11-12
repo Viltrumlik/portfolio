@@ -1,6 +1,6 @@
 # ProjectRow
 
-A list row for one project: a `signal` index, a bold title, a one-line summary, the stack, and a right-hand meta column.
+One line of `ls -la` for a project: an index, a bold mono title, a one-line summary, the stack, and a right-hand meta column.
 
 **Provide:**
 - `index`, `title` and `summary`.
@@ -10,4 +10,4 @@ A list row for one project: a `signal` index, a bold title, a one-line summary, 
 
 - **Layout.** Stack the rows inside a window titled like a folder ("projects — 4 items").
 - **Summary.** One sentence about what the project does for whom, not the tech.
-- **Links.** With `href`, the row tints to `well` on hover, the title turns `signal` and the arrow springs.
+- **Links.** With `href`, the row tints to `signal-soft` on hover, `> ` appears before the index, the title glows in `signal` and the arrow springs.

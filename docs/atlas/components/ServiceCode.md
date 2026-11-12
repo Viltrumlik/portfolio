@@ -6,4 +6,4 @@ A two-letter mono stamp that stands for a connected service. Atlas uses these in
 
 - The codes are listed in the "Connections and automation" section.
 - Use `lg` in integration windows and `sm` in feeds and rules.
-- Don't recolor stamps per brand. Only the `Dock` lights one up in `lime`, to mark the active item.
+- Don't recolor stamps per brand. They glow in the theme's `signal`; only the `Dock` fills one with `lime`, to mark the active item.

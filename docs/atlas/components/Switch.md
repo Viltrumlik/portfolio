@@ -1,6 +1,6 @@
 # Switch
 
-An on/off toggle (`role="switch"`) for settings that take effect immediately. When on, the track fills with `lime` and the thumb springs across.
+An on/off toggle (`role="switch"`) for settings that take effect immediately. When on, the square track fills with `lime` and blooms, and the thumb springs across.
 
 **Provide:** a `label`, plus either `checked` with `onChange(next)` or `defaultChecked`. Optional: `disabled`.
 

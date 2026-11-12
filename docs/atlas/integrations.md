@@ -25,7 +25,7 @@ Each `IntegrationCard` is a window titled "connections/<name>", and it is in exa
 | State | Badge | Actions | Copy |
 |---|---|---|---|
 | `off` | neutral "Not connected" | primary "Connect" | One sentence on what the service feeds |
-| `syncing` | accent "Syncing", pulsing | disabled "Syncing…", ghost "Disconnect" | The cadence ("Daily at 03:00") |
+| `syncing` | accent "Syncing", blinking dot | disabled "Syncing…", ghost "Disconnect" | The cadence ("Daily at 03:00") |
 | `connected` | live "Connected" | "Sync now", ghost "Disconnect" | The last sync and the cadence ("4 min ago · hourly + push") |
 | `error` | danger "Needs attention" with the alert glyph; the window's outline and title bar turn `danger` | primary "Reconnect", ghost "Disconnect" | What failed, the service's error code and the next step |
 
