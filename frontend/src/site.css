@@ -236,7 +236,7 @@ textarea.at-field__input {
   display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--space-3);
   padding: 0 var(--space-1); color: var(--ink); text-decoration: none;
 }
-.at-ls__perm { color: var(--phosphor-dim); }
+.at-ls__perm { color: var(--ink-muted); }
 .at-ls__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
 .at-ls__meta { max-width: 18ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-muted); }
 a.at-ls__row:hover { background: var(--signal-soft); color: var(--signal); text-shadow: var(--text-glow); }

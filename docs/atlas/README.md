@@ -72,7 +72,7 @@ The rest of this section names the color tokens by role.
   - Use `signal` as text or a mark: links, display type, numerals, the terminal, section indexes. Show `signal` text on `signal-soft` for hovered rows and the selected palette row.
 - **Light levels.**
   - `phosphor-hot` is the white-hot core: rain heads and the primary button on hover.
-  - `phosphor-dim` is decoration: rain trails, `//` prefixes, `ls` permission columns.
+  - `phosphor-dim` is decoration only: rain trails and the `//` and `## ` prefixes. It is under 4.5:1, so it never colours text; `frontend/src/atlas/contrast.test.ts` fails the frontend tests if it does.
   - `glow` (16% of the hue) and `glow-strong` (45%) only ever appear inside shadows.
 - **State.** `danger` is red in every theme and always comes with the alert glyph and a sentence. `danger-soft` is the tint behind it.
 - **Data.** `heat-0` to `heat-4` ramp from `well` up to full phosphor. Use them only in the contribution graph and on the cover.
@@ -197,8 +197,8 @@ The effects live in `frontend/src/fx`. They are public pages only; the studio ke
   - `danger` passes 4.9:1 or more on window and well.
   - `on-lime` on `lime` is 10.3:1 or more.
   - Control borders (`edge-strong`) pass 5.3:1 or more, and the focus ring 10.9:1 or more.
-- **Known gaps.**
-  - `phosphor-dim` is only 3.4–4.1:1 on a window. It is fine for its decorative uses (`//` prefixes, `ls` permissions). However, project index numbers, project stack lines and palette group labels currently use it for small text, and they should move to `ink-muted`.
+- **Dim on purpose.**
+  - `phosphor-dim` is only 3.4–4.1:1 on a window, so it is kept to `::before`/`::after` prefixes. Project indexes, stack lines, `ls` permissions and palette group labels use `ink-muted`.
   - `heat-1` is a faint step (about 1.8:1 on a window). The graph's total and legend carry the numbers.
 
 ## Using this system

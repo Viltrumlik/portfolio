@@ -138,6 +138,15 @@ def test_command_palette_data_for_visitors(client):
     assert not any(a.get("href") == "/studio/" for a in actions)
 
 
+def test_switch_theme_is_found_by_the_phosphor_theme_names(client):
+    f.profile()
+    data = _cmdk(html_of(client.get("/about/"), keep_cmdk=True))
+    theme = next(a for a in data["groups"][-1]["items"] if a.get("action") == "theme")
+    words = set(theme["keywords"].split())
+    assert {"green", "amber", "ice"} <= words
+    assert not words & {"sage", "pulse", "light"}
+
+
 def test_command_palette_offers_studio_to_staff(client):
     f.profile()
     staff = get_user_model().objects.create_user("owner", password="x-test-pass", is_staff=True)

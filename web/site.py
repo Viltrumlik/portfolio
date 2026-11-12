@@ -40,7 +40,7 @@ def command_palette(profile, is_staff=False):
         }
         for post in published_posts().prefetch_related("tags")[:10]
     ]
-    actions = [{"label": "Switch theme", "action": "theme", "icon": "power", "keywords": "dark light sage pulse"}]
+    actions = [{"label": "Switch theme", "action": "theme", "icon": "power", "keywords": "green amber ice phosphor colour color"}]
     if profile.email:
         actions.append({"label": "Copy email address", "action": f"copy:{profile.email}", "icon": "link", "keywords": "mail contact"})
     if profile.cv:
