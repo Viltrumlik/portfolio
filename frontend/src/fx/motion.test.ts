@@ -100,3 +100,18 @@ describe('frameLoop', () => {
     loop.destroy();
   });
 });
+
+describe('fitCanvas', () => {
+  it('caps the pixel ratio at the given maximum', async () => {
+    const { fitCanvas } = await import('./motion');
+    vi.stubGlobal('devicePixelRatio', 3);
+    const canvas = document.createElement('canvas');
+    const ctx = { setTransform: vi.fn() } as unknown as CanvasRenderingContext2D;
+    fitCanvas(canvas, ctx, 100, 50, 1);
+    expect([canvas.width, canvas.height]).toEqual([100, 50]);
+    fitCanvas(canvas, ctx, 100, 50);
+    expect([canvas.width, canvas.height]).toEqual([200, 100]);
+    vi.unstubAllGlobals();
+  });
+});
+

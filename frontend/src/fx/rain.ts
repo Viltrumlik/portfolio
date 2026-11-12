@@ -1,10 +1,23 @@
 // Digital rain: <canvas data-island="rain" class="fx-rain" aria-hidden="true">, fixed behind the page.
-// ~24 fps, DPR capped at 2, pauses while the tab is hidden. Reduced motion: one faint static frame.
+// ~20 fps at 1x pixels (the rain is faint; pixel count is what costs), pauses while the tab is hidden,
+// and settles into one still frame when the device can't keep up. Reduced motion: one faint still frame.
 
 import { fitCanvas, frameLoop, prefersReducedMotion, randomGlyph, themeColours, type Colours, type Loop } from './motion';
 
 const FONT_PX = 14;
-const FPS = 24;
+const FPS = 20;
+const SAMPLE = 30; // ticks to watch before judging the frame rate
+
+/**
+ * True when the median gap between the last `sample` ticks is over twice the target interval: the
+ * device is sustaining less than half the frame rate. The median ignores one long gap, such as a
+ * hidden tab coming back.
+ */
+export function struggling(gaps: number[], interval: number, sample: number = SAMPLE): boolean {
+  if (gaps.length < sample) return false;
+  const recent = gaps.slice(-sample).sort((a, b) => a - b);
+  return recent[recent.length >> 1] > interval * 2;
+}
 
 export const rainColumns = (width: number, fontPx: number = FONT_PX): number => Math.max(1, Math.ceil(width / fontPx));
 
@@ -35,7 +48,7 @@ export function initRain(canvas: HTMLCanvasElement): Rain | null {
   const resize = () => {
     width = win.innerWidth;
     height = win.innerHeight;
-    fitCanvas(canvas, ctx, width, height);
+    fitCanvas(canvas, ctx, width, height, 1);
     const cols = rainColumns(width);
     const rows = Math.ceil(height / FONT_PX);
     drops = Array.from({ length: cols }, (_, i) => drops[i] ?? Math.floor(Math.random() * -rows));
@@ -71,11 +84,28 @@ export function initRain(canvas: HTMLCanvasElement): Rain | null {
   };
 
   resize();
-  const still = prefersReducedMotion(win);
+  let still = prefersReducedMotion(win);
   let loop: Loop | null = null;
+  const gaps: number[] = [];
+  let lastTick = 0;
+  const tick = (now: number) => {
+    if (lastTick) {
+      gaps.push(now - lastTick);
+      if (gaps.length > SAMPLE) gaps.shift();
+    }
+    lastTick = now;
+    draw();
+    if (struggling(gaps, 1000 / FPS)) {
+      // This device can't keep up: stop animating and leave a calm still frame.
+      loop?.destroy();
+      loop = null;
+      still = true;
+      drawStatic();
+    }
+  };
   if (still) drawStatic();
   else {
-    loop = frameLoop(draw, FPS, doc);
+    loop = frameLoop(tick, FPS, doc);
     loop.start();
   }
 

@@ -5,7 +5,7 @@ import { finePointer, fitCanvas, frameLoop, prefersReducedMotion, randomGlyph, t
 
 export const TRAIL_CAP = 120;
 const LIFE = 1;
-const FPS = 45;
+const FPS = 30;
 
 interface Particle {
   x: number;
@@ -42,7 +42,7 @@ export function initCursorTrail(doc: Document = document): Trail | null {
   const resize = () => {
     width = win.innerWidth;
     height = win.innerHeight;
-    fitCanvas(canvas, ctx, width, height);
+    fitCanvas(canvas, ctx, width, height, 1);
     ctx.font = '13px "JetBrains Mono", ui-monospace, monospace';
   };
 

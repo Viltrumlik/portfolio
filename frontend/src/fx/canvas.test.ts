@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { initRain, rainColumns, stepDrops } from './rain';
+import { initRain, rainColumns, stepDrops, struggling } from './rain';
 import { initCursorTrail, TRAIL_CAP } from './trail';
 
 function fakeCtx() {
@@ -27,6 +27,14 @@ afterEach(() => {
 });
 
 describe('rain helpers', () => {
+  it('calls a device struggling only on a sustained slow median, not one long pause', () => {
+    const healthy = Array(30).fill(50);
+    expect(struggling(healthy, 50)).toBe(false);
+    expect(struggling([...healthy.slice(1), 10_000], 50)).toBe(false); // a hidden tab coming back
+    expect(struggling(Array(30).fill(150), 50)).toBe(true);
+    expect(struggling(Array(10).fill(150), 50)).toBe(false); // not enough evidence yet
+  });
+
   it('derives the column count from width and glyph size', () => {
     expect(rainColumns(1400, 14)).toBe(100);
     expect(rainColumns(10, 14)).toBe(1);
@@ -49,7 +57,7 @@ describe('initRain', () => {
     expect(initRain(document.querySelector('canvas')!)).toBeNull();
   });
 
-  it('sizes the canvas to the viewport with DPR capped at 2', () => {
+  it('draws at 1x even on dense screens: the rain is faint, and pixels are what make it slow', () => {
     vi.useFakeTimers();
     const ctx = fakeCtx();
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(ctx as never);
@@ -57,10 +65,36 @@ describe('initRain', () => {
     document.body.innerHTML = '<canvas data-island="rain"></canvas>';
     const canvas = document.querySelector('canvas')!;
     const rain = initRain(canvas)!;
-    expect(canvas.width).toBe(window.innerWidth * 2);
-    expect(canvas.height).toBe(window.innerHeight * 2);
+    expect(canvas.width).toBe(window.innerWidth);
+    expect(canvas.height).toBe(window.innerHeight);
     rain.destroy();
     vi.unstubAllGlobals();
+  });
+
+  function pumpFrames(gapMs: number, frames: number) {
+    const queue: FrameRequestCallback[] = [];
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => queue.push(cb));
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(fakeCtx() as never);
+    document.body.innerHTML = '<canvas data-island="rain"></canvas>';
+    const rain = initRain(document.querySelector('canvas')!)!;
+    let t = 1000;
+    for (let i = 0; i < frames && queue.length; i++) {
+      t += gapMs;
+      queue.shift()!(t);
+    }
+    return rain;
+  }
+
+  it('settles into a still frame when the device cannot keep up', () => {
+    const rain = pumpFrames(250, 80); // 4 frames a second
+    expect(rain.running).toBe(false);
+  });
+
+  it('keeps raining at a healthy frame rate', () => {
+    const rain = pumpFrames(1000 / 60, 600);
+    expect(rain.running).toBe(true);
+    rain.destroy();
   });
 
   it('draws one static frame and does not animate under reduced motion', () => {

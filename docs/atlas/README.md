@@ -56,7 +56,7 @@ The rest of this section names the color tokens by role.
 
 - **Surfaces.**
   - `desk`: the ground behind the rain.
-  - `window`: the window surface. It is 86% opaque so the rain shows faintly through, with a 2px backdrop blur.
+  - `window`: the window surface. It is 86% opaque, so the rain shows faintly through. Nothing is blurred: see "Performance" under Motion.
   - `window-bar`: inactive title bars.
   - `well`: kbd keys, service codes, dock items, badges and empty heat cells.
   - `desk-dot`: the optional `.at-dotgrid`.
@@ -152,8 +152,12 @@ These properties live in `components/bundle.css`.
 
 - **On load.** Each window switches on like a CRT: it starts as a thin, overbright line, opens to full height and settles (`at-pop`).
   - The delays are staggered 70ms apart, left to right and then row by row.
-  - After that, the only things that keep moving are blinking cursors and live dots, the rain, and a few of the busiest heat cells fading in and out.
+  - After that, the only things that keep moving are blinking cursors and live dots, and the rain.
 - **Blinks, not pings.** Live dots, the menu-bar cursor and the typer cursor blink in hard steps (`steps(1)`), like a terminal.
+- **Performance.** The rain repaints the whole screen about 20 times a second, so nothing that has to be recomputed on every frame may sit over it.
+  - No `backdrop-filter` anywhere: blurring 15 windows over the rain halved the frame rate.
+  - No endless animations with a `filter`.
+  - `frontend/src/atlas/perf.test.ts` fails the frontend tests if either comes back.
 
 ### Effects
 
@@ -161,11 +165,11 @@ The effects live in `frontend/src/fx`. They are public pages only; the studio ke
 
 | Effect | Markup | What it does | Under reduced motion |
 |---|---|---|---|
-| Digital rain | `<canvas data-island="rain" class="fx-rain">` | Columns of katakana and digits at 14px, about 24fps, 55% opacity, in the theme's colours, fixed behind the page. Pauses in hidden tabs. | One faint, static frame |
+| Digital rain | `<canvas data-island="rain" class="fx-rain">` | Columns of katakana and digits at 14px, about 20fps, drawn at 1× pixels even on dense screens, 55% opacity, in the theme's colours, fixed behind the page. Pauses in hidden tabs, and settles into a still frame when the device sustains less than half its frame rate. | One faint, static frame |
 | Boot screen | `<div data-island="bootscreen" class="fx-boot" hidden>` | Once per browser session (`sessionStorage` `atlas:booted`): about a second of BIOS-style log, then a 300ms CRT collapse. Any key, click, wheel or touch skips it. | Never runs |
 | Decode | `data-island="decode"` on a heading | Scrambles random glyphs into the heading's own text when it scrolls into view. `data-decode="load"` runs it at load, and `data-decode-repeat="9000"` repeats it. The real text stays in `aria-label` meanwhile. | Plain text |
 | Typer | `<pre data-island="typer" data-loop data-max-lines>` | Replays a transcript the server already rendered: `$ ` lines type at 45ms a character, output appears at once, a block cursor blinks. Screen readers get the full transcript. | Static transcript |
-| Cursor trail | Document-level | Glyphs drip from the pointer and fade, up to 120 at a time. Fine pointers only. An idle page costs nothing. | Off |
+| Cursor trail | Document-level | Glyphs drip from the pointer and fade, up to 120 at a time, at 30fps and 1× pixels. Fine pointers only. An idle page costs nothing. | Off |
 | Sound | `[data-sound-toggle]` in the menu bar | Off by default. WebAudio-synthesised clicks, keystroke ticks and a theme blip, with no audio files. The choice is kept in `localStorage` `atlas:sound`. | Still opt-in |
 | Page transitions | `@view-transition { navigation: auto }` | The old page glitches out (180ms), the new one scans in from the top (300ms). | Off |
 

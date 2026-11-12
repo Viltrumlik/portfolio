@@ -142,7 +142,6 @@ body::after {
   position: relative; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden;
   background: var(--window); color: var(--ink);
   border: 1px solid var(--edge); border-radius: var(--radius-md); box-shadow: var(--shadow-hard);
-  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
   transition: box-shadow var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
 }
 .at-win:hover { box-shadow: var(--shadow-lift); border-color: var(--edge-strong); }
@@ -189,7 +188,6 @@ body::after {
 .at-dock {
   display: inline-flex; gap: var(--space-2); padding: var(--space-2);
   background: var(--window); border: 1px solid var(--edge); border-radius: var(--radius-md); box-shadow: var(--shadow-hard);
-  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
 }
 .at-dock__item {
   display: grid; place-items: center; width: 40px; height: 40px; box-sizing: border-box; padding: 0;
@@ -206,8 +204,7 @@ body::after {
 .at-menubar {
   position: sticky; top: 0; z-index: 1500;
   display: flex; align-items: center; gap: var(--space-5); height: 38px; padding: 0 var(--space-4);
-  background: color-mix(in srgb, var(--desk) 86%, transparent); border-bottom: 1px solid var(--edge); color: var(--ink-muted);
-  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  background: color-mix(in srgb, var(--desk) 94%, transparent); border-bottom: 1px solid var(--edge); color: var(--ink-muted);
   font: 700 11px/16px var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase;
 }
 .at-menubar__brand {
@@ -300,10 +297,6 @@ a.at-prow:focus-visible { outline: 2px solid transparent; box-shadow: var(--focu
 .at-graph__scroll { overflow-x: auto; }
 .at-graph svg { display: block; }
 .at-graph__cell { rx: 1px; }
-.at-graph__cell.at-heat-4 { filter: drop-shadow(0 0 2px var(--glow-strong)); }
-.at-graph__cell.at-heat-4:nth-child(3n) { animation: at-glow 2.4s ease-in-out infinite; }
-.at-graph__cell.at-heat-4:nth-child(5n+1) { animation: at-glow 2.4s ease-in-out 0.8s infinite; }
-@keyframes at-glow { 50% { opacity: 0.35; } }
 .at-heat-0 { fill: var(--heat-0); background: var(--heat-0); }
 .at-heat-1 { fill: var(--heat-1); background: var(--heat-1); }
 .at-heat-2 { fill: var(--heat-2); background: var(--heat-2); }
@@ -386,7 +379,7 @@ a.at-repo:focus-visible { outline: 2px solid transparent; box-shadow: var(--focu
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .at-badge__dot.is-pulse, .at-menubar__status i.is-pulse, .at-menubar__logo, .at-graph__cell { animation: none !important; }
+  .at-badge__dot.is-pulse, .at-menubar__status i.is-pulse, .at-menubar__logo { animation: none !important; }
   .at-desk > .at-win, .at-win:hover > .at-win__bar { animation: none; }
   .at-btn, .at-win, .at-switch, .at-switch__thumb, .at-dock__item, .at-prow, .at-prow__title, .at-prow__year .at-icon, .at-repo, .at-field__input { transition: none; }
   .at-btn:active, .at-dock__item:hover { transform: none; }

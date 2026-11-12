@@ -106,9 +106,15 @@ export function frameLoop(tick: (now: number) => void, fps: number, doc: Documen
 }
 
 /** Canvas backing size: CSS pixels times devicePixelRatio, capped at 2. */
-export function fitCanvas(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, width: number, height: number): void {
+export function fitCanvas(
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  maxDpr = 2,
+): void {
   const win = canvas.ownerDocument.defaultView ?? window;
-  const dpr = Math.min(2, Math.max(1, win.devicePixelRatio || 1));
+  const dpr = Math.min(maxDpr, Math.max(1, win.devicePixelRatio || 1));
   canvas.width = Math.round(width * dpr);
   canvas.height = Math.round(height * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
