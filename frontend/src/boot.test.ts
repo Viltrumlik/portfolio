@@ -29,12 +29,25 @@ describe('boot', () => {
   });
 
   it('wires the theme toggles once even when booted twice', () => {
-    document.documentElement.setAttribute('data-theme', 'dark');
+    document.documentElement.setAttribute('data-theme', 'green');
     document.body.innerHTML = '<button data-theme-toggle>theme</button>';
     boot(document);
     boot(document);
     document.querySelector<HTMLElement>('[data-theme-toggle]')!.click();
-    expect(document.documentElement.dataset.theme).toBe('light');
+    expect(document.documentElement.dataset.theme).toBe('amber');
+  });
+
+  it('registers the Matrix effects islands', () => {
+    document.body.innerHTML = `
+      <div data-island="bootscreen" class="fx-boot" hidden></div>
+      <canvas data-island="rain"></canvas>
+      <h2 data-island="decode">Selected work</h2>
+      <pre data-island="typer">$ whoami</pre>`;
+    boot(document);
+    for (const name of ['bootscreen', 'rain', 'decode', 'typer']) {
+      expect(document.querySelector(`[data-island="${name}"]`)?.hasAttribute('data-island-ready') ?? true).toBe(true);
+    }
+    expect(document.querySelector('[data-island="decode"]')!.hasAttribute('data-island-ready')).toBe(true);
   });
 
   it('keeps going when one island throws', () => {

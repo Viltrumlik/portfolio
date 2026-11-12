@@ -207,13 +207,14 @@ def menubar(context):
     return format_html(
         '<header class="at-menubar"><a class="at-menubar__brand" href="/"><span class="at-menubar__logo" aria-hidden="true"></span>{}</a>'
         '<nav class="at-menubar__nav" aria-label="Primary">{}</nav><div class="at-menubar__end">{}{}'
+        '<button type="button" class="at-menubar__sound" data-sound-toggle aria-pressed="false"><span data-sound-label>Sound off</span></button>'
         '<button type="button" class="at-menubar__cmd" aria-label="Open command palette" data-cmdk-open>{}</button></div></header>',
         profile.handle or profile.name, links, status, clock_html, c.kbd("⌘K"),
     )
 
 
 @register.simple_tag(takes_context=True)
-def now_window(context, id=None, x=None, y=None, w=None, active=False, title="now.app", delay=None):
+def now_window(context, id=None, x=None, y=None, w=None, active=False, title="now.app", delay=None, h=None):
     """The now.app window: local time, availability, location, and the current track (if fresh)."""
     profile = _profile(context)
     avail = live.availability(profile)
@@ -239,7 +240,7 @@ def now_window(context, id=None, x=None, y=None, w=None, active=False, title="no
         ' data-now-row="listening"' + ("" if music else " hidden"),
     )
     return c.window_open(
-        title, active=active, id=id, x=x, y=y, w=w, label="Now", cls="at-now", delay=delay,
+        title, active=active, id=id, x=x, y=y, w=w, h=h, label="Now", cls="at-now", delay=delay,
         attrs={"data_island": "now", "data_src": reverse("web:live_now")},
     ) + format_html('<div class="at-win__body">{}{}{}</div></section>', head, place, listening)
 

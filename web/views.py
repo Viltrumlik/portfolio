@@ -15,7 +15,9 @@ from content.models import Experience, Profile, Service, SocialLink, Skill, Tag
 from content.rendering import excerpt, render_body, render_markdown
 from integrations.models import Connection, ContributionDay, Repo
 
-from . import live, og
+from integrations.services import contribution_total
+
+from . import desk, live, og
 from .forms import ContactForm
 from .models import ContactMessage
 from .site import published_posts, visible_projects
@@ -75,11 +77,31 @@ def home(request):
         provider=Connection.Provider.GITHUB, status=Connection.Status.CONNECTED).exists()
 
     order = [name for name, shown in (("work", featured), ("activity", pinned or events), ("writing", posts), ("contact", True)) if shown]
+    skills = list(Skill.objects.all())
+    social_links = list(SocialLink.objects.all())
+    project_total = projects.count()
+    commits = contribution_total()
+    sys_stats = [s for s in (
+        {"value": commits, "label": "Commits this year"} if commits is not None else None,
+        {"value": project_total, "label": "Projects"},
+        {"value": published_posts().count(), "label": "Posts"},
+        {"value": Repo.objects.count(), "label": "Repos"} if has_github else None,
+    ) if s]
+    layout = desk.desk_layout({
+        "about": True, "terminal": True, "now": True, "graph": has_graph, "projects": bool(featured),
+        "links": bool(social_links), "stack": bool(skills), "activity": bool(events), "stats": True,
+    })
     return render(request, "web/home.html", {
         "seo": page_meta(request),
-        "bio_excerpt": excerpt(profile.bio, words=32),
+        "bio_excerpt": excerpt(profile.bio, words=20),
         "has_graph": has_graph,
-        "now_y": 250 if has_graph else 24,
+        "desk": layout,
+        "win": layout["windows"],
+        "terminal": desk.terminal_transcript(profile, project_total, events),
+        "stack_cfg": desk.stack_config(skills),
+        "social_links": social_links,
+        "sys_stats": sys_stats,
+        "project_total": project_total,
         "dock_items": _dock_items(has_github),
         "featured": featured,
         "work_title": f"projects — {len(featured)} item{'' if len(featured) == 1 else 's'}",

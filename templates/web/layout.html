@@ -1,6 +1,8 @@
 {% extends "base.html" %}{% load atlas %}
 {% block body_class %}at-site{% endblock %}
 {% block body %}
+<div data-island="bootscreen" class="fx-boot" data-name="{{ profile.handle|default:profile.name }}" hidden></div>
+<canvas data-island="rain" class="fx-rain" aria-hidden="true"></canvas>
 <a class="at-skip" href="#main">Skip to content</a>
 {% menubar %}
 <main id="main">

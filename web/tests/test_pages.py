@@ -31,8 +31,8 @@ def test_home_renders_menubar_desk_about_now_and_dock(client):
     f.profile()
     html = html_of(client.get("/"))
     assert '<header class="at-menubar">' in html
-    assert '<div class="at-desk" data-island="desk" style="--desk-h:560px">' in html
-    assert '<section class="at-win is-active" data-win="about" aria-label="about.md"' in html
+    assert re.search(r'<div class="at-desk" data-island="desk" style="--desk-h:\d+px" aria-label="Desktop">', html)
+    assert '<section class="at-win is-active" data-win="about" aria-label="about.sys"' in html
     assert "I build backends that keep working" in html
     assert "I build server-side systems, REST APIs and bots." in html
     assert '<a href="/work/" class="at-btn at-btn--primary"><span>See my work</span>' in html
@@ -45,7 +45,7 @@ def test_home_renders_menubar_desk_about_now_and_dock(client):
 def test_home_hides_github_window_and_dock_item_without_data(client):
     f.profile()
     html = html_of(client.get("/"))
-    assert "github.app" not in html
+    assert "commits.log" not in html
     assert ">GH</a>" not in html
 
 
@@ -53,7 +53,7 @@ def test_home_shows_github_window_when_contributions_exist(client):
     f.profile()
     ContributionDay.objects.create(date=dt.date(2026, 11, 10), count=4)
     html = html_of(client.get("/"))
-    assert 'aria-label="github.app"' in html
+    assert 'aria-label="commits.log"' in html
     assert '<figure class="at-graph">' in html
     assert '>GH</a>' in html
 

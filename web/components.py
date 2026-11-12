@@ -117,7 +117,7 @@ def _length(v):
 
 
 def window_open(title, active=False, id=None, x=None, y=None, w=None, label=None, cls=None, bar_end=None,
-                delay=None, attrs=None):
+                delay=None, attrs=None, h=None):
     style = []
     if x not in (None, ""):
         style.append(f"--x:{_length(x)}")
@@ -125,6 +125,8 @@ def window_open(title, active=False, id=None, x=None, y=None, w=None, label=None
         style.append(f"--y:{_length(y)}")
     if w not in (None, ""):
         style.append(f"--w:{_length(w)}")
+    if h not in (None, ""):
+        style.append(f"--h:{_length(h)}")
     if delay not in (None, ""):
         style.append(f"--delay:{_num(delay)}ms")
     head = format_html(
@@ -157,7 +159,7 @@ def section_header(title, index=None, kicker=None, action=None):
     )
     return format_html(
         '<header class="at-section"><div class="at-section__meta">{}</div><div class="at-section__row">'
-        '<h2 class="at-section__title">{}</h2>{}</div></header>',
+        '<h2 class="at-section__title" data-island="decode">{}</h2>{}</div></header>',
         meta, title, action or "",
     )
 

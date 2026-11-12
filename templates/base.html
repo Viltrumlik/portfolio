@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{% if seo.title %}{{ seo.title }}{% else %}{{ profile.name }}{% endif %}{% endblock %}</title>
   <meta name="description" content="{% block description %}{% if seo %}{{ seo.description }}{% else %}{{ profile.headline }}{% endif %}{% endblock %}">
-  <meta name="color-scheme" content="dark light">
+  <meta name="color-scheme" content="dark">
   {% block meta %}{% if seo %}
   <link rel="canonical" href="{{ seo.canonical }}">
   <meta property="og:type" content="{{ seo.type }}">
@@ -21,7 +21,7 @@
   {% endif %}{% endblock %}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Martian+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=VT323&display=swap">
   {% vite_asset "src/main.ts" %}
   {% block head %}{% endblock %}
 </head>

@@ -1,19 +1,60 @@
 {% extends "web/layout.html" %}{% load atlas %}
 {% block hero %}
-{% desk height=560 %}
-  {% window title="about.md" active=True id="about" x="3%" y=24 w="46%" delay=0 %}
-    <p class="mono-caps">{{ profile.name }}</p>
-    <h1 class="display-lg">{{ profile.headline|default:profile.name }}</h1>
-    {% if bio_excerpt %}<p class="body-lg">{{ bio_excerpt }}</p>{% endif %}
+{% desk height=desk.height label="Desktop" %}
+  {% with L=win.about %}
+  {% window title="about.sys" active=True id="about" x=L.x y=L.y w=L.w h=L.h delay=L.delay %}
+    <p class="mono-caps">&gt; decrypting identity · {{ profile.name }}</p>
+    <h1 class="display-xl at-name" data-island="decode" data-decode="load" data-decode-repeat="9000">{{ profile.handle|default:profile.name }}</h1>
+    {% if profile.headline %}<p class="body-lg at-tagline">{{ profile.headline }}</p>{% endif %}
+    {% if bio_excerpt %}<p class="body-sm at-muted">{{ bio_excerpt }}</p>{% endif %}
     <div class="at-row">
       {% button "See my work" href="/work/" variant="primary" icon_right="arrow-right" %}
       {% if profile.cv %}{% button "Download CV" href=profile.cv.url icon_right="arrow-up-right" %}{% endif %}
     </div>
   {% endwindow %}
-  {% if has_graph %}
-  {% window title="github.app" id="github" x="52%" y=24 w="45%" delay=100 %}{% contribution_graph %}{% endwindow %}
-  {% endif %}
-  {% now_window id="now" x="52%" y=now_y w="36%" delay=200 %}
+  {% endwith %}
+
+  {% with L=win.terminal %}
+  {% window title="terminal — tty1" id="terminal" x=L.x y=L.y w=L.w h=L.h delay=L.delay cls="at-termwin" bar_end="bash" %}<pre class="at-term" data-island="typer" data-loop="5000" data-max-lines="9">{{ terminal }}</pre>{% endwindow %}
+  {% endwith %}
+
+  {% with L=win.now %}{% now_window id="now" x=L.x y=L.y w=L.w h=L.h delay=L.delay %}{% endwith %}
+
+  {% if win.graph %}{% with L=win.graph %}
+  {% window title="commits.log" id="github" x=L.x y=L.y w=L.w h=L.h delay=L.delay %}{% contribution_graph %}{% endwindow %}
+  {% endwith %}{% endif %}
+
+  {% if win.projects %}{% with L=win.projects %}
+  {% window title="projects/" id="projects" x=L.x y=L.y w=L.w h=L.h delay=L.delay bar_end=project_total %}
+    <ul class="at-ls" aria-label="Projects">
+      {% for p in featured %}<li><a class="at-ls__row" href="{{ p.get_absolute_url }}"><span class="at-ls__perm" aria-hidden="true">drwxr-xr-x</span><span class="at-ls__name">{{ p.slug }}/</span><span class="at-ls__meta">{% if p.repo %}★ {{ p.repo.stars }}{% else %}{{ p.kind|lower }}{% endif %}</span></a></li>{% endfor %}
+    </ul>
+    <a class="at-ls__more" href="/work/">$ cd ~/projects ↵</a>
+  {% endwindow %}
+  {% endwith %}{% endif %}
+
+  {% if win.links %}{% with L=win.links %}
+  {% window title="links.sh" id="links" x=L.x y=L.y w=L.w h=L.h delay=L.delay %}
+    <ul class="at-ls" aria-label="Elsewhere">
+      {% for link in social_links %}<li><a class="at-ls__row" href="{{ link.url }}" rel="me noopener" target="_blank"><span class="at-ls__perm" aria-hidden="true">lrwxrwxrwx</span><span class="at-ls__name">{{ link.platform|lower }}</span><span class="at-ls__meta">→ {{ link.label|default:link.platform }}</span></a></li>{% endfor %}
+    </ul>
+  {% endwindow %}
+  {% endwith %}{% endif %}
+
+  {% if win.stack %}{% with L=win.stack %}
+  {% window title="stack.cfg" id="stack" x=L.x y=L.y w=L.w h=L.h delay=L.delay %}<pre class="at-cfg">{% for group, names in stack_cfg %}<span class="at-cfg__sec">[{{ group }}]</span>
+{{ names|join:", " }}
+{% endfor %}</pre>{% endwindow %}
+  {% endwith %}{% endif %}
+
+  {% if win.activity %}{% with L=win.activity %}
+  {% window title="activity.feed" id="activity" x=L.x y=L.y w=L.w h=L.h delay=L.delay bar_end="live" %}{% activity_feed events|slice:":5" label="Latest activity" %}{% endwindow %}
+  {% endwith %}{% endif %}
+
+  {% with L=win.stats %}
+  {% window title="sys.info" id="stats" x=L.x y=L.y w=L.w h=L.h delay=L.delay %}<div class="at-sysinfo">{% for s in sys_stats %}{% stat s.value s.label %}{% endfor %}</div>{% endwindow %}
+  {% endwith %}
+
   {% dock dock_items %}
 {% enddesk %}
 {% endblock %}

@@ -106,7 +106,7 @@ def test_section_header_with_action():
     assert html.startswith(
         '<header class="at-section"><div class="at-section__meta"><span class="at-section__index">01</span>'
         '<span class="at-section__kicker">Selected work</span></div><div class="at-section__row">'
-        '<h2 class="at-section__title">Things I built</h2><a href="/work/" class="at-btn at-btn--ghost at-btn--sm">'
+        '<h2 class="at-section__title" data-island="decode">Things I built</h2><a href="/work/" class="at-btn at-btn--ghost at-btn--sm">'
     )
 
 
@@ -276,3 +276,14 @@ def test_clock_tag_renders_server_time():
         f'<time data-island="clock" data-tz="Asia/Tashkent" data-format="HH:MM">{now:%H:%M}</time>',
         f'<time data-island="clock" data-tz="Asia/Tashkent" data-format="HH:MM">{(now + dt.timedelta(minutes=1)):%H:%M}</time>',
     )
+
+
+def test_window_takes_an_optional_height():
+    html = render('{% window title="t.sys" id="t" x="2%" y=20 w="30%" h=250 %}x{% endwindow %}')
+    assert 'style="--x:2%;--y:20px;--w:30%;--h:250px"' in html
+
+
+@pytest.mark.django_db
+def test_menubar_has_a_sound_toggle_that_starts_off():
+    html = render("{% menubar %}", {"profile": Profile.load()}, request=RequestFactory().get("/"))
+    assert '<button type="button" class="at-menubar__sound" data-sound-toggle aria-pressed="false"><span data-sound-label>Sound off</span></button>' in html
