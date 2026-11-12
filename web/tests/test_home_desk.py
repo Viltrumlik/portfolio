@@ -41,6 +41,16 @@ def test_projects_window_lists_featured_projects_like_ls(client):
     assert '<span class="at-ls__name">volunteers-bot/</span>' in html
 
 
+def test_projects_window_shows_stars_or_falls_back_to_the_kind(client):
+    f.profile()
+    f.project("starred", featured=True, kind="Platform", repo=f.repo("starred", stars=3))
+    f.project("unstarred", featured=True, kind="Game", repo=f.repo("unstarred", stars=0))
+    html = html_of(client.get("/"))
+    assert '<span class="at-ls__meta">★ 3</span>' in html
+    assert '<span class="at-ls__meta">game</span>' in html
+    assert "★ 0" not in html
+
+
 def test_stack_cfg_and_links_windows_show_only_with_data(client):
     f.profile()
     html = html_of(client.get("/"))

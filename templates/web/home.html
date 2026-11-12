@@ -27,7 +27,7 @@
   {% if win.projects %}{% with L=win.projects %}
   {% window title="projects/" id="projects" x=L.x y=L.y w=L.w h=L.h delay=L.delay bar_end=project_total %}
     <ul class="at-ls" aria-label="Projects">
-      {% for p in featured %}<li><a class="at-ls__row" href="{{ p.get_absolute_url }}"><span class="at-ls__perm" aria-hidden="true">drwxr-xr-x</span><span class="at-ls__name">{{ p.slug }}/</span><span class="at-ls__meta">{% if p.repo %}★ {{ p.repo.stars }}{% else %}{{ p.kind|lower }}{% endif %}</span></a></li>{% endfor %}
+      {% for p in featured %}<li><a class="at-ls__row" href="{{ p.get_absolute_url }}"><span class="at-ls__perm" aria-hidden="true">drwxr-xr-x</span><span class="at-ls__name">{{ p.slug }}/</span><span class="at-ls__meta">{% if p.repo.stars %}★ {{ p.repo.stars }}{% else %}{{ p.kind|lower }}{% endif %}</span></a></li>{% endfor %}
     </ul>
     <a class="at-ls__more" href="/work/">$ cd ~/projects ↵</a>
   {% endwindow %}
