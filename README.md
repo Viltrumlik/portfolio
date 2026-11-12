@@ -1,4 +1,4 @@
-# guts.uz — Atlas portfolio
+# viltrumlik.uz — Atlas portfolio
 
 A self-updating developer portfolio. The home page is a desk of draggable windows (about, GitHub graph, now playing) built on the **Atlas** design system. The site syncs from connected services (GitHub, Telegram, Last.fm, outgoing webhooks) and runs small "When → Then" automations.
 
@@ -16,8 +16,6 @@ A self-updating developer portfolio. The home page is a desk of draggable window
 | `jobs` | Database job queue + `run_jobs` runner (retries with backoff) |
 | `studio` | Owner-only `/studio/`: connections, webhooks, automations, content, inbox, jobs |
 | `frontend/` | Vite + TypeScript + Preact: Atlas CSS (generated from `tokens.json`) and islands (desk drag, clock, now, ⌘K palette, theme, template preview) |
-
-`legacy/` holds the previous site's code until it is deleted.
 
 ## Local development
 
@@ -43,18 +41,18 @@ npm --prefix frontend test
 
 `manage.py run_jobs` schedules periodic syncs (GitHub hourly + public events every 5 min, Last.fm every minute) and runs due jobs for ~50 s. Production runs it every minute with `deploy/guts-jobs.timer`. `manage.py sync_now <provider>` forces a sync.
 
-## Deploy (guts.uz)
+## Deploy (viltrumlik.uz)
 
 Live app dir: `/home/viltrumlik/portfolio`, user `guts`, gunicorn on `/run/guts.sock`.
 
 1. Build the frontend locally: `npm --prefix frontend run build` (writes `static/dist/`).
 2. Back up the server database: `cp db.sqlite3 db.sqlite3.pre-atlas`.
-3. rsync the code **without `--delete`** (macOS openrsync deletes excluded files), excluding `.venv .git __pycache__ '*.pyc' .env db.sqlite3* graphify-out .claude .DS_Store public frontend/node_modules`. Include `static/dist/`.
+3. rsync the code **without `--delete`** (macOS openrsync deletes excluded files), excluding `.venv .git __pycache__ '*.pyc' .env db.sqlite3* graphify-out .claude .DS_Store public frontend/node_modules`. Include `static/dist/`. Because there is no `--delete`, remove files deleted from the repo on the server by hand.
 4. On the server (as `guts`): `pip install -r requirements.txt`, `python manage.py migrate`, `python manage.py import_legacy` (first deploy only), `python manage.py collectstatic --noinput`.
 5. `.env` additions:
    - `ATLAS_FERNET_KEYS` — generate with `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`. Newest key first; keep old keys listed to rotate.
-   - `SITE_URL=https://guts.uz`
-6. nginx (`/etc/nginx/sites-available/guts`, inside the proxy `location`): `proxy_set_header X-Real-IP $remote_addr;` — the contact-form and studio-login rate limits read the client IP from it.
+   - `SITE_URL=https://viltrumlik.uz`
+6. nginx (`/etc/nginx/sites-available/viltrumlik`, inside the proxy `location`): `proxy_set_header X-Real-IP $remote_addr;` — the contact-form and studio-login rate limits read the client IP from it.
 7. Install the job timer: copy `deploy/guts-jobs.service` and `deploy/guts-jobs.timer` to `/etc/systemd/system/`, then `systemctl daemon-reload && systemctl enable --now guts-jobs.timer`.
 8. `systemctl restart guts.service`, then connect services in `/studio/`.
 
