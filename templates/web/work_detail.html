@@ -14,6 +14,12 @@
   </div>
 {% endwindow %}
 
+{% if project.has_image %}
+{% window title="screenshot.png" %}
+  <img class="at-shot" src="{{ project.image.url }}" alt="Screenshot of {{ project.display_title }}" width="{{ project.image.width }}" height="{{ project.image.height }}" decoding="async">
+{% endwindow %}
+{% endif %}
+
 {% if repo %}
 {% window title="repo.stats" %}
   <div class="at-stats">

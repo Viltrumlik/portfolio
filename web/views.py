@@ -34,8 +34,10 @@ PAGE_OG = {
 }
 
 
-def page_meta(request, title=None, description=None, og_kind="page", og_slug="home", type="website"):
-    """Title, description, canonical URL and Open Graph values for base.html."""
+def page_meta(request, title=None, description=None, og_kind="page", og_slug="home", type="website", image_path=None):
+    """Title, description, canonical URL and Open Graph values for base.html.
+
+    The image is the generated card for og_kind/og_slug unless image_path (an uploaded picture) is given."""
     profile = Profile.load()
     base = settings.SITE_URL.rstrip("/")
     description = (description or profile.headline or "").strip()
@@ -46,7 +48,7 @@ def page_meta(request, title=None, description=None, og_kind="page", og_slug="ho
         "og_title": title or profile.name,
         "description": description,
         "canonical": base + request.path,
-        "image": base + reverse("web:og", args=[og_kind, og_slug]),
+        "image": base + (image_path or reverse("web:og", args=[og_kind, og_slug])),
         "type": type,
         "site_name": profile.name,
     }
@@ -148,7 +150,8 @@ def project(request, slug):
     obj = get_object_or_404(visible_projects(), slug=slug)
     repo = obj.repo
     return render(request, "web/work_detail.html", {
-        "seo": page_meta(request, obj.display_title, obj.summary or (repo.description if repo else ""), "project", obj.slug, "article"),
+        "seo": page_meta(request, obj.display_title, obj.summary or (repo.description if repo else ""), "project", obj.slug, "article",
+                         image_path=obj.image.url if obj.has_image else None),
         "project": obj,
         "repo": repo,
         "repo_url": repo.url if repo else f"https://github.com/{obj.repo_full_name}",
@@ -188,7 +191,8 @@ def post(request, slug):
     obj = get_object_or_404(published_posts().prefetch_related("tags"), slug=slug)
     description = obj.excerpt or excerpt(obj.body, words=30, body_format=obj.body_format)
     return render(request, "web/writing_detail.html", {
-        "seo": page_meta(request, obj.title, description, "post", obj.slug, "article"),
+        "seo": page_meta(request, obj.title, description, "post", obj.slug, "article",
+                         image_path=obj.cover.url if obj.has_image else None),
         "post": obj,
         "body_html": render_body(obj.body, obj.body_format),
     })

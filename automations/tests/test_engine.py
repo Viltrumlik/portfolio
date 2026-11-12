@@ -29,7 +29,7 @@ def tg():
 def sent(monkeypatch):
     messages = []
     monkeypatch.setattr(telegram, "send_message", lambda conn, text, chat_id=None: messages.append(("send", text)))
-    monkeypatch.setattr(telegram, "post_channel", lambda conn, text: messages.append(("channel", text)))
+    monkeypatch.setattr(telegram, "post_channel", lambda conn, text, photo_url=None: messages.append(("channel", text) if photo_url is None else ("channel", text, photo_url)))
     return messages
 
 
@@ -117,7 +117,7 @@ def test_disabled_and_non_matching_rules_do_not_run(tg, sent):
 
 
 def test_failed_action_is_recorded_and_other_rules_still_run(tg, sent, monkeypatch):
-    def broken(conn, text):
+    def broken(conn, text, photo_url=None):
         raise Transient("Telegram is having trouble (502). It will retry.")
 
     monkeypatch.setattr(telegram, "post_channel", broken)
@@ -212,3 +212,23 @@ def test_emit_then_run_jobs_runs_the_rule_end_to_end(tg, sent):
     emit("contact.submitted", {"name": "Ann"})
     runner.run_due(10)
     assert sent == [("send", "From Ann")]
+
+
+def test_release_posts_carry_the_projects_picture(tg, sent, settings):
+    from content.models import Project
+
+    settings.SITE_URL = "https://site.test"
+    Project.objects.create(repo_full_name="Viltrumlik/mars", slug="mars")
+    rule("github.release.published", "telegram.post_channel", template="New release {{repo}} {{tag}}")
+    dispatch(Event.objects.create(type="github.release.published", payload={"repo": "Viltrumlik/mars", "tag": "v1"}))
+    assert sent == [("channel", "New release Viltrumlik/mars v1", "https://site.test/og/project/mars.png")]
+
+
+def test_hidden_or_unknown_projects_post_text_only(tg, sent):
+    from content.models import Project
+
+    Project.objects.create(repo_full_name="Viltrumlik/secret", slug="secret", hidden=True)
+    rule("github.release.published", "telegram.post_channel", template="{{repo}}")
+    dispatch(Event.objects.create(type="github.release.published", payload={"repo": "Viltrumlik/secret", "tag": "v1"}))
+    dispatch(Event.objects.create(type="github.release.published", payload={"repo": "someone/else", "tag": "v1"}))
+    assert sent == [("channel", "Viltrumlik/secret"), ("channel", "someone/else")]

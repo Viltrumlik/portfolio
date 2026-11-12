@@ -81,16 +81,17 @@ def test_feed_has_published_posts_only(client):
     assert "Secret draft" not in xml
 
 
-def test_og_image_is_generated_in_atlas_style_and_cached(client):
+def test_og_image_is_a_matrix_card_and_cached(client):
     f.profile()
     f.post("hello", title="Hello world")
     r = client.get("/og/post/hello.png")
     assert r.status_code == 200 and r["Content-Type"] == "image/png"
     img = Image.open(io.BytesIO(b"".join(r.streaming_content))).convert("RGB")
     assert img.size == (1200, 630)
-    assert img.getpixel((5, 5)) == (12, 13, 15)  # graphite desk
+    assert sum(img.getpixel((5, 5))) < 45  # near-black desk
     colors = {c for _, c in img.getcolors(1200 * 630)}
-    assert (197, 248, 42) in colors  # lime title bar
+    assert (0, 255, 65) in colors  # phosphor title bar
+    assert (197, 248, 42) not in colors  # no v2 lime
     cached = list((settings.MEDIA_ROOT / "og" / "post").glob("hello-*.png"))
     assert len(cached) == 1
     mtime = cached[0].stat().st_mtime_ns

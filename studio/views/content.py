@@ -149,7 +149,7 @@ def _announce(post):
 def post_edit(request, pk=None):
     post = get_object_or_404(Post, pk=pk) if pk else None
     was_published = bool(post and post.status == Post.Status.PUBLISHED)
-    form = PostForm(request.POST or None, instance=post)
+    form = PostForm(request.POST or None, request.FILES or None, instance=post)
     if request.method == "POST" and form.is_valid():
         with transaction.atomic():
             saved = form.save(commit=False)
@@ -201,7 +201,7 @@ def project_list(request):
 @require_http_methods(["GET", "POST"])
 def project_edit(request, pk):
     project = get_object_or_404(Project, pk=pk)
-    form = ProjectForm(request.POST or None, instance=project)
+    form = ProjectForm(request.POST or None, request.FILES or None, instance=project)
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, f"“{project.display_title}” saved.")

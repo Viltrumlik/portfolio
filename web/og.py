@@ -1,38 +1,41 @@
-"""Open Graph images in the Atlas style: a cream window with a lime title bar on the graphite desk.
+"""Open Graph images in the Atlas v3 Matrix style: a phosphor terminal window over digital rain.
 
 Images are cached under MEDIA_ROOT/og/<kind>/<slug>-<digest>.png; the digest covers the text,
-so editing a title produces a new image and the old one is removed.
+so editing a title produces a new image and the old one is removed. Bump VERSION to redraw them all.
 """
 import hashlib
 import os
+import random
 import re
 import tempfile
 from pathlib import Path
 
 from django.conf import settings
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 WIDTH, HEIGHT = 1200, 630
-GRAPHITE = (12, 13, 15)
-DESK_DOT = (31, 34, 38)
-CREAM = (255, 253, 247)
-LIME = (197, 248, 42)
-INK = (21, 21, 21)
-INK_MUTED = (88, 92, 84)
-DESK_INK = (232, 230, 223)
-VERSION = "1"
+DESK = (1, 8, 2)
+WINDOW = (3, 18, 8)
+EDGE = (13, 79, 32)
+PHOSPHOR = (0, 255, 65)
+PHOSPHOR_DIM = (15, 127, 48)
+ON_PHOSPHOR = (0, 26, 7)
+INK = (180, 255, 198)
+INK_MUTED = (95, 191, 122)
+VERSION = "2"
 
-SANS_FONTS = [
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-    "/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf",
-    "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
-    "/Library/Fonts/Arial Bold.ttf",
-]
-MONO_FONTS = [
-    "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
-    "/usr/share/fonts/dejavu/DejaVuSansMono.ttf",
+FONTS = Path(__file__).resolve().parent / "fonts"
+BOLD_FONTS = [
+    FONTS / "JetBrainsMono-Bold.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf",
     "/System/Library/Fonts/Menlo.ttc",
 ]
+MONO_FONTS = [
+    FONTS / "JetBrainsMono-Regular.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+    "/System/Library/Fonts/Menlo.ttc",
+]
+RAIN_GLYPHS = "01<>=+*:;/|$#{}[]"
 
 
 def _font(candidates, size, setting):
@@ -62,48 +65,79 @@ def _wrap(draw, text, font, max_width, max_lines):
     return lines
 
 
-def render(title, subtitle="", label="about.md", handle=""):
-    img = Image.new("RGB", (WIDTH, HEIGHT), GRAPHITE)
-    draw = ImageDraw.Draw(img)
-    for x in range(9, WIDTH, 18):
-        for y in range(9, HEIGHT, 18):
-            draw.point((x, y), fill=DESK_DOT)
+def _rain(draw, seed):
+    """Faint columns of glyphs behind the window, the same for the same text."""
+    rng = random.Random(seed)
+    font = _font(MONO_FONTS, 18, "ATLAS_OG_MONO_FONT")
+    for x in range(14, WIDTH, 26):
+        if rng.random() < 0.45:
+            continue
+        top, length = rng.randrange(-200, HEIGHT), rng.randrange(4, 16)
+        for i in range(length):
+            y = top + i * 22
+            if 0 <= y < HEIGHT:
+                fade = (i + 1) / length
+                color = tuple(int(c * 0.35 * fade) for c in PHOSPHOR)
+                draw.text((x, y), rng.choice(RAIN_GLYPHS), font=font, fill=color)
 
-    left, top, right, bottom = 80, 70, 1110, 520
-    draw.rectangle((left + 10, top + 10, right + 10, bottom + 10), fill=(0, 0, 0))  # hard offset shadow
-    draw.rectangle((left, top, right, bottom), fill=CREAM, outline=INK, width=3)
-    bar = 56
-    draw.rectangle((left + 3, top + 3, right - 3, top + bar), fill=LIME)
-    draw.line((left, top + bar, right, top + bar), fill=INK, width=3)
-    for i in range(3):
-        cx = left + 30 + i * 26
-        draw.ellipse((cx - 8, top + bar // 2 - 7, cx + 8, top + bar // 2 + 9), outline=INK, width=2)
-    mono = _font(MONO_FONTS, 24, "ATLAS_OG_MONO_FONT")
-    draw.text((left + 120, top + bar // 2 + 1), label, font=mono, fill=INK, anchor="lm")
+
+def render(title, subtitle="", label="about.md", handle=""):
+    img = Image.new("RGB", (WIDTH, HEIGHT), DESK)
+    _rain(ImageDraw.Draw(img), hashlib.sha256(f"{title}|{label}".encode()).hexdigest())
+
+    left, top, right, bottom = 80, 64, 1120, 536
+    bar = 54
+
+    # Bloom: the window outline and title, blurred and added on top.
+    glow = Image.new("RGB", (WIDTH, HEIGHT), (0, 0, 0))
+    gd = ImageDraw.Draw(glow)
+    gd.rectangle((left, top, right, bottom), outline=PHOSPHOR, width=6)
+    gd.rectangle((left, top, right, top + bar), fill=PHOSPHOR_DIM)
+
+    draw = ImageDraw.Draw(img)
+    draw.rectangle((left, top, right, bottom), fill=WINDOW, outline=PHOSPHOR, width=2)
+    draw.rectangle((left, top, right, top + bar), fill=PHOSPHOR)
+    mono = _font(MONO_FONTS, 22, "ATLAS_OG_MONO_FONT")
+    bold_small = _font(BOLD_FONTS, 22, "ATLAS_OG_FONT")
+    draw.rectangle((left + 24, top + bar // 2 - 6, left + 36, top + bar // 2 + 6), fill=ON_PHOSPHOR)
+    draw.text((left + 52, top + bar // 2 + 1), label.upper(), font=bold_small, fill=ON_PHOSPHOR, anchor="lm")
+    for i in range(3):  # [_][□][x] controls, drawn as boxes
+        x = right - 34 - i * 30
+        draw.rectangle((x - 9, top + bar // 2 - 9, x + 9, top + bar // 2 + 9), outline=ON_PHOSPHOR, width=2)
 
     body_w = right - left - 120
-    for size, max_lines in ((72, 2), (60, 3), (48, 3)):
-        font = _font(SANS_FONTS, size, "ATLAS_OG_FONT")
+    for size, max_lines in ((66, 2), (56, 3), (46, 3)):
+        font = _font(BOLD_FONTS, size, "ATLAS_OG_FONT")
         lines = _wrap(draw, title, font, body_w, max_lines)
         if len(lines) <= max_lines and all(draw.textlength(ln, font=font) <= body_w for ln in lines):
             break
-    y = top + bar + 50
+    y = top + bar + 48
     for line in lines:
-        draw.text((left + 60, y), line, font=font, fill=INK)
-        y += int(size * 1.15)
+        draw.text((left + 60, y), line, font=font, fill=PHOSPHOR)
+        gd.text((left + 60, y), line, font=font, fill=PHOSPHOR_DIM)
+        y += int(size * 1.18)
     if subtitle:
-        small = _font(SANS_FONTS, 30, "ATLAS_OG_FONT")
+        small = _font(MONO_FONTS, 28, "ATLAS_OG_MONO_FONT")
         for line in _wrap(draw, subtitle, small, body_w, 2):
-            if y + 40 > bottom - 20:
+            if y + 40 > bottom - 24:
                 break
             y += 14
             draw.text((left + 60, y), line, font=small, fill=INK_MUTED)
-            y += 30
+            y += 32
 
-    draw.rectangle((left, 566, left + 16, 582), fill=LIME)
     if handle:
-        draw.text((left + 30, 574), handle, font=_font(MONO_FONTS, 24, "ATLAS_OG_MONO_FONT"), fill=DESK_INK, anchor="lm")
-    return img
+        prompt = f"$ {handle}"
+        draw.text((left, 576), prompt, font=_font(MONO_FONTS, 26, "ATLAS_OG_MONO_FONT"), fill=INK, anchor="lm")
+        x = left + draw.textlength(prompt, font=_font(MONO_FONTS, 26, "ATLAS_OG_MONO_FONT")) + 10
+        draw.rectangle((x, 562, x + 14, 590), fill=PHOSPHOR)
+
+    img = ImageChops.add(img, glow.filter(ImageFilter.GaussianBlur(14)))
+    # CRT scanlines: darken every third row.
+    lines = Image.new("L", (WIDTH, HEIGHT), 0)
+    ld = ImageDraw.Draw(lines)
+    for row in range(0, HEIGHT, 3):
+        ld.line((0, row, WIDTH, row), fill=70)
+    return Image.composite(Image.new("RGB", (WIDTH, HEIGHT), (0, 0, 0)), img, lines)
 
 
 def image_path(kind, slug, title, subtitle="", label="about.md", handle=""):

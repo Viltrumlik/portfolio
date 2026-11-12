@@ -7,6 +7,7 @@ from ..errors import AuthError, Permanent, RateLimited, Transient
 
 SERVICE = "Telegram"
 MAX_TEXT = 4096
+MAX_CAPTION = 1024
 
 
 def escape_html(value):
@@ -81,11 +82,11 @@ def find_chat_id(bot_token):
     return None
 
 
-def _fit(text):
+def _fit(text, limit=MAX_TEXT):
     """Cut to Telegram's limit without leaving half an HTML entity at the end."""
-    if len(text) <= MAX_TEXT:
+    if len(text) <= limit:
         return text
-    cut = re.sub(r"&[#a-zA-Z0-9]*$", "", text[: MAX_TEXT - 1])
+    cut = re.sub(r"&[#a-zA-Z0-9]*$", "", text[: limit - 1])
     return cut + "…"
 
 
@@ -105,16 +106,23 @@ def send_message(connection, text, chat_id=None):
     )
 
 
-def post_channel(connection, text):
-    """Post `text` (HTML) to config["channel_id"]."""
+CHANNEL_FORBIDDEN = "Telegram refused: the bot is not an admin of the channel. Add it as an admin who can post messages."
+
+
+def post_channel(connection, text, photo_url=None):
+    """Post `text` (HTML) to config["channel_id"], as the caption of `photo_url` when one is given.
+
+    If Telegram can't fetch the picture (a 400), the post goes out as plain text instead of not at all.
+    """
     channel_id = (connection.config or {}).get("channel_id")
     if not channel_id:
         raise Permanent("No Telegram channel is set. Add the channel id on the Telegram connection.", code="no_channel")
-    return _call(
-        connection.credentials["bot_token"],
-        "sendMessage",
-        forbidden="Telegram refused: the bot is not an admin of the channel. Add it as an admin who can post messages.",
-        chat_id=channel_id,
-        text=_fit(text),
-        parse_mode="HTML",
-    )
+    token = connection.credentials["bot_token"]
+    if photo_url:
+        try:
+            return _call(token, "sendPhoto", forbidden=CHANNEL_FORBIDDEN, chat_id=channel_id, photo=photo_url,
+                         caption=_fit(text, MAX_CAPTION), parse_mode="HTML")
+        except Permanent as exc:
+            if exc.code != "400":
+                raise
+    return _call(token, "sendMessage", forbidden=CHANNEL_FORBIDDEN, chat_id=channel_id, text=_fit(text), parse_mode="HTML")

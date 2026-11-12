@@ -1,8 +1,12 @@
 """Content: profile, experience / skills / services / links, posts (publishing emits once), project curation."""
 import datetime as dt
 
+import io
+
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
+from PIL import Image
 
 from automations.models import Event
 from content.models import Experience, Post, Profile, Project, Service, Skill, SocialLink, Tag
@@ -192,3 +196,37 @@ def test_tags_are_reused(staff):
     Tag.objects.create(name="Django", slug="django")
     staff.post("/studio/content/posts/new/", post_data(tags="django, New tag"))
     assert sorted(Tag.objects.values_list("slug", flat=True)) == ["django", "new-tag"]
+
+
+# --- images ---------------------------------------------------------------------------
+
+
+def png(name="shot.png"):
+    buf = io.BytesIO()
+    Image.new("RGB", (12, 8), (0, 255, 65)).save(buf, "PNG")
+    return SimpleUploadedFile(name, buf.getvalue(), content_type="image/png")
+
+
+def test_project_form_uploads_an_image(staff):
+    project = Project.objects.create(repo_full_name="a1/mars", slug="mars")
+    page = html(staff.get(f"/studio/content/projects/{project.pk}/"))
+    assert 'enctype="multipart/form-data"' in page and 'name="image"' in page
+    r = staff.post(f"/studio/content/projects/{project.pk}/", {"title": "Mars", "stack": "", "order": 0, "image": png()})
+    assert r.status_code == 302
+    project.refresh_from_db()
+    assert project.image.name.startswith("projects/shot")
+
+
+def test_project_form_rejects_a_file_that_is_not_an_image(staff):
+    project = Project.objects.create(repo_full_name="a1/mars", slug="mars")
+    fake = SimpleUploadedFile("shot.png", b"not an image", content_type="image/png")
+    r = staff.post(f"/studio/content/projects/{project.pk}/", {"title": "Mars", "stack": "", "order": 0, "image": fake})
+    assert r.status_code == 200
+    project.refresh_from_db()
+    assert not project.image
+
+
+def test_post_form_uploads_a_cover(staff):
+    r = staff.post("/studio/content/posts/new/", {**post_data(), "cover": png("cover.png")})
+    assert r.status_code == 302
+    assert Post.objects.get().cover.name.startswith("writing/cover")

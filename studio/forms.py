@@ -35,6 +35,16 @@ class AtlasModelForm(forms.ModelForm):
         style(self)
 
 
+MAX_IMAGE_BYTES = 5 * 1024 * 1024
+
+
+def limit_image_size(upload):
+    """Uploaded pictures are capped at 5 MB; ImageField itself rejects files that aren't images."""
+    if upload and getattr(upload, "size", 0) > MAX_IMAGE_BYTES:
+        raise forms.ValidationError("That picture is over 5 MB. Export it smaller (1200×630 is plenty) and upload it again.")
+    return upload
+
+
 def secret_input():
     return forms.PasswordInput(render_value=False, attrs={"autocomplete": "new-password", "spellcheck": "false"})
 
@@ -246,11 +256,11 @@ class SocialLinkForm(AtlasModelForm):
 
 class PostForm(AtlasModelForm):
     tags = forms.CharField(label="Tags", required=False, max_length=500, help_text="Comma-separated: Django, Bots.")
-    field_order = ["title", "slug", "excerpt", "body", "tags", "status"]
+    field_order = ["title", "slug", "excerpt", "cover", "body", "tags", "status"]
 
     class Meta:
         model = Post
-        fields = ["title", "slug", "excerpt", "body", "status"]
+        fields = ["title", "slug", "excerpt", "cover", "body", "status"]
         help_texts = {"slug": "Leave empty to make one from the title.", "body": "Markdown.", "excerpt": "One or two sentences for lists and previews."}
         widgets = {"excerpt": forms.Textarea(attrs={"rows": 3}), "body": forms.Textarea(attrs={"rows": 18, "spellcheck": "true"})}
 
@@ -270,6 +280,9 @@ class PostForm(AtlasModelForm):
             slug, n = f"{base}-{n}", n + 1
         return slug
 
+    def clean_cover(self):
+        return limit_image_size(self.cleaned_data.get("cover"))
+
     def save_tags(self, post):
         tags = []
         for name in _split_list(self.cleaned_data.get("tags")):
@@ -285,8 +298,9 @@ class ProjectForm(AtlasModelForm):
 
     class Meta:
         model = Project
-        fields = ["title", "summary", "kind", "stack", "case_study", "featured", "hidden", "order"]
-        labels = {"case_study": "Case study", "featured": "Featured on the home page", "hidden": "Hidden from the site"}
+        fields = ["title", "summary", "kind", "stack", "image", "case_study", "featured", "hidden", "order"]
+        labels = {"case_study": "Case study", "featured": "Featured on the home page", "hidden": "Hidden from the site",
+                  "image": "Screenshot"}
         help_texts = {"title": "Leave empty to use the repo name.", "case_study": "Markdown."}
         widgets = {"summary": forms.Textarea(attrs={"rows": 3}), "case_study": forms.Textarea(attrs={"rows": 14})}
 
@@ -296,3 +310,6 @@ class ProjectForm(AtlasModelForm):
 
     def clean_stack(self):
         return _split_list(self.cleaned_data.get("stack"))
+
+    def clean_image(self):
+        return limit_image_size(self.cleaned_data.get("image"))

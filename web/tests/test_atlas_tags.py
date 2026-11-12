@@ -159,7 +159,8 @@ def test_project_row_from_project():
     p = Project.objects.create(repo_full_name="a/volunteers_bot", slug="volunteers-bot", title="Volunteers bot",
                                summary="Registers volunteers.", kind="Bot", stack=["aiogram", "Redis"], repo=repo)
     html = render("{% project_row p index=1 %}", {"p": p})
-    assert html.startswith('<a class="at-prow" href="/work/volunteers-bot/"><span class="at-prow__index">01</span>')
+    assert html.startswith('<a class="at-prow at-prow--media" href="/work/volunteers-bot/"><span class="at-prow__index">01</span>'
+                           '<img class="at-prow__thumb" src="/og/project/volunteers-bot.png" alt=""')
     assert '<span class="at-prow__title">Volunteers bot</span><span class="at-prow__summary">Registers volunteers.</span>' in html
     assert '<span class="at-prow__stack">aiogram · Redis</span>' in html
     assert '<span class="at-prow__year">Bot<svg' in html

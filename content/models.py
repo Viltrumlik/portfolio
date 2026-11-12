@@ -120,7 +120,7 @@ class Post(models.Model):
     tags = models.ManyToManyField(Tag, blank=True, related_name="posts")
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.DRAFT)
     published_at = models.DateTimeField(null=True, blank=True)
-    cover = models.FileField(upload_to="writing/", blank=True)
+    cover = models.ImageField(upload_to="writing/", blank=True, help_text="Optional. Without one, the post gets a generated card.")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -132,6 +132,15 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse("web:post", args=[self.slug])
+
+    @property
+    def has_image(self):
+        return bool(self.cover)
+
+    @property
+    def image_url(self):
+        """The uploaded cover, or the generated Matrix card."""
+        return self.cover.url if self.cover else reverse("web:og", args=["post", self.slug])
 
     @property
     def reading_minutes(self):
@@ -153,6 +162,8 @@ class Project(models.Model):
     featured = models.BooleanField(default=False)
     hidden = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=0)
+    image = models.ImageField(upload_to="projects/", blank=True,
+                              help_text="A screenshot; 1200×630 fits best. Without one, the project gets a generated card.")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -168,3 +179,12 @@ class Project(models.Model):
     @property
     def display_title(self):
         return self.title or self.repo_full_name.split("/")[-1]
+
+    @property
+    def has_image(self):
+        return bool(self.image)
+
+    @property
+    def image_url(self):
+        """The uploaded screenshot, or the generated Matrix card."""
+        return self.image.url if self.image else reverse("web:og", args=["project", self.slug])

@@ -7,7 +7,7 @@
     <h1 class="headline">{{ heading }}</h1>
     {% if intro %}<p class="mono-sm">{{ intro }}</p>{% endif %}
   </header>
-  <form method="post" action="{{ request.path }}" class="at-form at-stack{% if wide %} st-form--wide{% endif %}">
+  <form method="post" action="{{ request.path }}" class="at-form at-stack{% if wide %} st-form--wide{% endif %}"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
     {% csrf_token %}
     {% include "studio/partials/form_errors.html" %}
     {% for field in form %}{% include "studio/partials/field.html" %}{% endfor %}

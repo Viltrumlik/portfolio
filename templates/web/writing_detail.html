@@ -8,6 +8,7 @@
       {% if post.excerpt %}<p class="body-lg">{{ post.excerpt }}</p>{% endif %}
       {% with tags=post.tags.all %}{% if tags %}<div class="at-row">{% for t in tags %}{% url 'web:tag' t.slug as tag_url %}{% button t.name href=tag_url variant="ghost" size="sm" %}{% endfor %}</div>{% endif %}{% endwith %}
     </header>
+    {% if post.has_image %}<img class="at-shot" src="{{ post.cover.url }}" alt="" width="{{ post.cover.width }}" height="{{ post.cover.height }}" decoding="async">{% endif %}
     <div class="at-prose">{{ body_html }}</div>
   </article>
   <div class="at-row">{% button "All posts" href="/writing/" variant="ghost" icon_right="arrow-right" %}</div>

@@ -187,7 +187,7 @@ def dock(items, label="Dock"):
     return format_html('<nav class="at-dock" aria-label="{}">{}</nav>', label, mark_safe("".join(rows)))
 
 
-def project_row(title, index=None, summary=None, stack=(), meta=None, href=None, status=None):
+def project_row(title, index=None, summary=None, stack=(), meta=None, href=None, status=None, image=None):
     index_text = f"{index:02d}" if isinstance(index, int) else (index or "")
     status_html = badge(status["label"], status.get("tone", "neutral"), status.get("dot")) if status else ""
     main = format_html(
@@ -197,11 +197,14 @@ def project_row(title, index=None, summary=None, stack=(), meta=None, href=None,
     )
     year = format_html('<span class="at-prow__year">{}{}</span>', meta if meta is not None else "",
                        icon("arrow-up-right", 16) if href else "")
-    inner = format_html('<span class="at-prow__index">{}</span>{}<span class="at-prow__stack">{}</span>{}',
-                        index_text, main, " · ".join(str(s) for s in (stack or [])), year)
+    thumb = format_html('<img class="at-prow__thumb" src="{}" alt="" loading="lazy" decoding="async" width="1200" height="630">',
+                        image) if image else ""
+    inner = format_html('<span class="at-prow__index">{}</span>{}{}<span class="at-prow__stack">{}</span>{}',
+                        index_text, thumb, main, " · ".join(str(s) for s in (stack or [])), year)
+    cls = "at-prow at-prow--media" if image else "at-prow"
     if href:
-        return format_html('<a class="at-prow" href="{}">{}</a>', href, inner)
-    return format_html('<div class="at-prow">{}</div>', inner)
+        return format_html('<a class="{}" href="{}">{}</a>', cls, href, inner)
+    return format_html('<div class="{}">{}</div>', cls, inner)
 
 
 def repo_card(name, owner=None, description=None, language=None, stars=0, forks=0, updated=None, pinned=False, href=None):

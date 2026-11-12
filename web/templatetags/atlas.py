@@ -157,6 +157,7 @@ def project_row(project=None, **kwargs):
             "stack": project.stack or ([repo.language] if repo and repo.language else []),
             "meta": project.kind or (str(project.created_at.year) if project.created_at else ""),
             "href": reverse("web:project", args=[project.slug]),
+            "image": project.image_url,
         }
         if repo and repo.is_archived:
             values["status"] = {"label": "Archived", "tone": "neutral"}

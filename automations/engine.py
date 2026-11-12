@@ -2,6 +2,7 @@
 import logging
 import re
 
+from django.conf import settings
 from django.db.models import F
 from django.utils import timezone
 
@@ -94,10 +95,21 @@ def telegram_send(rule, event):
     return "Sent a Telegram message."
 
 
+def _event_picture(event):
+    """An absolute URL of the picture for an event about one of the site's visible projects, or None."""
+    from content.models import Project
+
+    repo = (event.payload or {}).get("repo")
+    project = Project.objects.filter(repo_full_name=repo, hidden=False).first() if isinstance(repo, str) else None
+    return settings.SITE_URL.rstrip("/") + project.image_url if project else None
+
+
 def telegram_post_channel(rule, event):
     conn = _telegram()
-    telegram.post_channel(conn, _telegram_text(rule, event))
-    return f"Posted to {conn.config.get('channel_id', 'the channel')}."
+    picture = _event_picture(event)
+    telegram.post_channel(conn, _telegram_text(rule, event), photo_url=picture)
+    where = conn.config.get("channel_id", "the channel")
+    return f"Posted to {where} with a picture." if picture else f"Posted to {where}."
 
 
 def webhook_send(rule, event):

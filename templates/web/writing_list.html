@@ -14,7 +14,7 @@
   <div class="at-row">{% button "All posts" href="/writing/" variant="ghost" size="sm" icon_right="arrow-right" %}</div>
   {% endif %}
   {% if posts %}
-  <div class="at-prow-list">{% for post in posts %}{% url 'web:post' post.slug as post_url %}{% project_row title=post.title summary=post.excerpt href=post_url index=forloop.counter stack=post.tags.all meta=post.published_at|date:"M j, Y" %}{% endfor %}</div>
+  <div class="at-prow-list">{% for post in posts %}{% url 'web:post' post.slug as post_url %}{% project_row title=post.title summary=post.excerpt href=post_url index=forloop.counter stack=post.tags.all meta=post.published_at|date:"M j, Y" image=post.image_url %}{% endfor %}</div>
   {% else %}
   <p class="body">Nothing published yet.</p>
   {% endif %}

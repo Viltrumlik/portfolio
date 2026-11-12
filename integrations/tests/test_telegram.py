@@ -128,3 +128,23 @@ def test_errors_never_include_the_token(api, conn):
     with pytest.raises(Permanent) as info:
         telegram.send_message(conn, "x")
     assert TOKEN not in str(info.value)
+
+
+def test_post_channel_with_a_photo_sends_it_with_the_text_as_caption(api, conn):
+    api.add("POST", f"{BASE}/sendPhoto", json={"ok": True, "result": {}})
+    telegram.post_channel(conn, "New release", photo_url="https://site.test/media/projects/mars.png")
+    body = body_json(api.requests[0])
+    assert (body["chat_id"], body["photo"], body["caption"], body["parse_mode"]) == ("@atlas_news", "https://site.test/media/projects/mars.png", "New release", "HTML")
+
+
+def test_a_long_caption_is_cut_to_telegrams_limit(api, conn):
+    api.add("POST", f"{BASE}/sendPhoto", json={"ok": True, "result": {}})
+    telegram.post_channel(conn, "x" * 3000, photo_url="https://site.test/p.png")
+    assert len(body_json(api.requests[0])["caption"]) == 1024
+
+
+def test_a_photo_telegram_cannot_fetch_falls_back_to_text(api, conn):
+    api.add("POST", f"{BASE}/sendPhoto", status=400, json={"ok": False, "error_code": 400, "description": "Bad Request: wrong file identifier/HTTP URL specified"})
+    api.add("POST", f"{BASE}/sendMessage", json={"ok": True, "result": {}})
+    telegram.post_channel(conn, "New release", photo_url="https://site.test/missing.png")
+    assert body_json(api.requests[1])["text"] == "New release"
