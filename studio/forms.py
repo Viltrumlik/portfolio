@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from django import forms
 from django.utils.text import slugify
 
-from automations.models import Rule
+from automations.models import Rule, ScheduledPost
 from content.models import Experience, Post, Profile, Project, Service, Skill, SocialLink, Tag
 from integrations.crypto import mask
 from integrations.models import OutboundHook
@@ -313,3 +313,38 @@ class ProjectForm(AtlasModelForm):
 
     def clean_image(self):
         return limit_image_size(self.cleaned_data.get("image"))
+
+
+class ScheduledPostForm(AtlasModelForm):
+    """A channel post. publish_at is read and shown in the time zone active in the view (the owner's)."""
+
+    image_url = forms.URLField(label="Picture URL", required=False, assume_scheme="https",
+                               help_text="A public picture URL. Overrides the project's picture.")
+
+    class Meta:
+        model = ScheduledPost
+        fields = ["text", "project", "image_url", "publish_at"]
+        labels = {"image_url": "Picture URL", "publish_at": "Publish at"}
+        widgets = {
+            "text": forms.Textarea(attrs={"rows": 18, "spellcheck": "true"}),
+            "publish_at": forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"),
+        }
+
+    def __init__(self, *args, tz_label="", **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["publish_at"].input_formats = ["%Y-%m-%dT%H:%M"]
+        if tz_label:
+            self.fields["publish_at"].help_text = f"Your local time ({tz_label})."
+        self.fields["project"].queryset = Project.objects.order_by("hidden", "order", "slug")
+        self.fields["project"].empty_label = "No project (text only)"
+
+    def clean(self):
+        data = super().clean()
+        text = data.get("text") or ""
+        project = data.get("project")
+        has_picture = bool(data.get("image_url") or (project and not project.hidden))
+        limit = 1024 if has_picture else 4096
+        if len(text) > limit:
+            where = "a photo caption" if has_picture else "a post"
+            self.add_error("text", f"Telegram allows {limit} characters in {where}; this has {len(text)}.")
+        return data

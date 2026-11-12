@@ -6,4 +6,4 @@ class AutomationsConfig(AppConfig):
     name = "automations"
 
     def ready(self):
-        from . import engine  # noqa: F401  (registers the automations.dispatch job handler)
+        from . import channel, engine  # noqa: F401  (register job handlers and the channel queue)

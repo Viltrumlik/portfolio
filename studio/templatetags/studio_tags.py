@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
+from automations.models import ScheduledPost
 from jobs.models import Job
 from web import components as c
 from web.models import ContactMessage
@@ -21,6 +22,8 @@ def _nav(path):
         ("Desk", desk, path == desk or path.startswith(desk + "connections/"), 0),
         ("Automations", reverse("studio:automations"), path.startswith((reverse("studio:automations"), reverse("studio:webhooks"))), 0),
         ("Content", reverse("studio:content"), path.startswith(reverse("studio:content")), 0),
+        ("Channel", reverse("studio:channel"), path.startswith(reverse("studio:channel")),
+         ScheduledPost.objects.filter(status=ScheduledPost.Status.SCHEDULED).count()),
         ("Inbox", reverse("studio:inbox"), path.startswith(reverse("studio:inbox")), inbox),
         ("Jobs", reverse("studio:jobs"), path.startswith(reverse("studio:jobs")), failed),
     ]

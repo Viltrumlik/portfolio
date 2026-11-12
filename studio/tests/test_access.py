@@ -6,7 +6,7 @@ from django.test import Client
 from django.urls import URLPattern, resolve
 from django.utils import timezone
 
-from automations.models import Rule
+from automations.models import Rule, ScheduledPost
 from content.models import Experience, Post, Project, Service, Skill, SocialLink
 from integrations.models import OutboundHook
 from jobs.models import Job
@@ -48,6 +48,9 @@ PAGES = [
     "/studio/content/projects/{project}/",
     "/studio/inbox/",
     "/studio/jobs/",
+    "/studio/channel/",
+    "/studio/channel/new/",
+    "/studio/channel/{scheduled}/",
 ]
 
 ACTIONS = [
@@ -64,6 +67,7 @@ ACTIONS = [
     "/studio/inbox/{message}/read/",
     "/studio/inbox/{message}/delete/",
     "/studio/jobs/{job}/retry/",
+    "/studio/channel/{scheduled}/cancel/",
 ]
 
 
@@ -80,6 +84,7 @@ def ids():
         "project": Project.objects.create(repo_full_name="a1/bot", slug="bot").pk,
         "message": ContactMessage.objects.create(name="Dana", email="dana@example.com", message="Hi").pk,
         "job": Job.objects.create(kind="github.sync", status=Job.Status.FAILED, finished_at=timezone.now()).pk,
+        "scheduled": ScheduledPost.objects.create(text="Later", publish_at=timezone.now()).pk,
     }
 
 

@@ -1,0 +1,27 @@
+{% extends "studio/layout.html" %}{% load atlas %}
+{% block page_title %}Channel · Studio{% endblock %}
+{% block content %}
+{% window title="channel/queue.log" active=True label="Channel" %}
+  <header class="at-pagehead">
+    <p class="mono-caps"><a href="{% url 'studio:automations' %}">Automations</a></p>
+    <h1 class="headline">Channel</h1>
+    <p class="body">{{ intro }}</p>
+  </header>
+  {% url 'studio:channel_new' as new_url %}<div class="at-row">{% button "Schedule a post" href=new_url variant="primary" icon="plus" %}</div>
+  {% if rows %}
+  <ol class="at-ledger">
+    {% for row in rows %}
+    <li class="at-ledger__row">
+      <span class="at-ledger__key mono-sm">{{ row.key }}</span>
+      <div class="at-ledger__body">
+        <p class="title"><a href="{{ row.href }}">{{ row.title }}</a> {% badge row.badge.label tone=row.badge.tone %}</p>
+        <p class="at-ledger__meta">{{ row.meta }}</p>
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p class="body st-muted">Nothing scheduled. Schedule a post and the job runner publishes it at its time.</p>
+  {% endif %}
+{% endwindow %}
+{% endblock %}

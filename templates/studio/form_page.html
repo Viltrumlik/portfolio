@@ -20,7 +20,7 @@
   {% if delete_url %}
   <form method="post" action="{{ delete_url }}" class="st-danger-zone">
     {% csrf_token %}
-    <p class="body-sm">Deleting removes it from the site right away.</p>
+    <p class="body-sm">{{ delete_note|default:"Deleting removes it from the site right away." }}</p>
     {% button delete_label type="submit" variant="ghost" size="sm" icon="x" %}
   </form>
   {% endif %}

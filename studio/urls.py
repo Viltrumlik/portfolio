@@ -2,7 +2,7 @@
 from django.urls import path
 
 from .auth import LoginView, LogoutView, staff_required
-from .views import automations, connections, content, desk, inbox, jobs, webhooks
+from .views import automations, channel, connections, content, desk, inbox, jobs, webhooks
 
 app_name = "studio"
 
@@ -26,6 +26,10 @@ urlpatterns = [
     staff("webhooks/<int:pk>/test/", webhooks.webhook_test, "webhook_test"),
     staff("webhooks/<int:pk>/delete/", webhooks.webhook_delete, "webhook_delete"),
     # automation rules
+    staff("channel/", channel.post_list, "channel"),
+    staff("channel/new/", channel.post_edit, "channel_new"),
+    staff("channel/<int:pk>/", channel.post_edit, "channel_post"),
+    staff("channel/<int:pk>/cancel/", channel.cancel, "channel_cancel"),
     staff("automations/", automations.rule_list, "automations"),
     staff("automations/new/", automations.rule_edit, "rule_new"),
     staff("automations/<int:pk>/", automations.rule_edit, "rule"),

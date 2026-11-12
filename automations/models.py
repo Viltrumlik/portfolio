@@ -59,3 +59,45 @@ class RuleRun(models.Model):
 
     class Meta:
         ordering = ["-ran_at"]
+
+
+class ScheduledPost(models.Model):
+    """A post for the Telegram channel, published by the job runner at `publish_at`."""
+
+    class Status(models.TextChoices):
+        SCHEDULED = "scheduled", "Scheduled"
+        QUEUED = "queued", "Sending"
+        POSTED = "posted", "Posted"
+        FAILED = "failed", "Failed"
+        CANCELLED = "cancelled", "Cancelled"
+
+    text = models.TextField(help_text="Plain text. With a picture, Telegram allows 1024 characters; without one, 4096.")
+    project = models.ForeignKey("content.Project", null=True, blank=True, on_delete=models.SET_NULL, related_name="channel_posts",
+                                help_text="The post uses this project's screenshot or card as its picture.")
+    image_url = models.URLField(blank=True, help_text="A public picture URL. Overrides the project's picture.")
+    publish_at = models.DateTimeField(db_index=True)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.SCHEDULED, db_index=True)
+    message_id = models.BigIntegerField(null=True, blank=True)
+    posted_at = models.DateTimeField(null=True, blank=True)
+    error = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["publish_at", "id"]
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def title(self):
+        return (self.text.strip().splitlines() or [""])[0][:120]
+
+    def picture_url(self):
+        """An absolute, public picture URL for Telegram, or None for a text-only post."""
+        from django.conf import settings
+
+        if self.image_url:
+            return self.image_url
+        if self.project_id and not self.project.hidden:
+            return settings.SITE_URL.rstrip("/") + self.project.image_url
+        return None
