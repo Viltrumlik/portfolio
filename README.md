@@ -43,20 +43,50 @@ npm --prefix frontend test
 
 ## Deploy (viltrumlik.uz)
 
-Live app dir: `/home/viltrumlik/portfolio`, user `guts`, gunicorn on `/run/guts.sock`.
+Live app dir: `/home/viltrumlik/portfolio`, user `guts`, gunicorn on `/run/guts.sock` (socket-activated by `guts.socket`).
 
-1. Build the frontend locally: `npm --prefix frontend run build` (writes `static/dist/`).
-2. Back up the server database: `cp db.sqlite3 db.sqlite3.pre-atlas`.
-3. rsync the code **without `--delete`** (macOS openrsync deletes excluded files), excluding `.venv .git __pycache__ '*.pyc' .env db.sqlite3* graphify-out .claude .DS_Store public frontend/node_modules`. Include `static/dist/`. Because there is no `--delete`, remove files deleted from the repo on the server by hand.
-4. On the server (as `guts`): `pip install -r requirements.txt`, `python manage.py migrate`, `python manage.py import_legacy` (first deploy only), `python manage.py collectstatic --noinput`.
-5. `.env` additions:
-   - `ATLAS_FERNET_KEYS` — generate with `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`. Newest key first; keep old keys listed to rotate.
+### Automatic
+
+Every push to `main` runs `.github/workflows/deploy.yml`. It runs shellcheck, pytest, vitest, the typecheck and the frontend build. If they all pass, it packs a release with `deploy/make-release.sh` and pipes it over SSH to the server. Pushes that only touch docs or Markdown are skipped, and you can also start a run by hand from the Actions tab.
+
+On the server, `/usr/local/bin/portfolio-deploy` (`deploy/portfolio-deploy.sh`) takes over:
+1. Back up the code and the database to `/var/backups/portfolio/` (the newest 10 of each are kept).
+2. Sync the files, then run pip, `migrate` and `collectstatic`.
+3. Restart `guts.service` and check that `/`, `/work/`, `/writing/` and `/api/live/now.json` return 200.
+4. If any step or the health check fails, restore that code and database and restart, and the workflow goes red.
+
+`.env`, `.venv`, `db.sqlite3*`, `public/` and the job lock are never touched. The live revision is in `REVISION`.
+
+### By hand
+
+```bash
+npm --prefix frontend run build
+deploy/make-release.sh > release.tar.gz
+ssh root@viltrumlik.uz portfolio-deploy < release.tar.gz
+```
+
+Don't rsync from a Mac with `--delete`: macOS openrsync deletes excluded files. `portfolio-deploy` runs rsync on the server, where `--delete` respects the exclusions.
+
+### One-time server setup
+
+1. `.env` additions:
+   - `ATLAS_FERNET_KEYS`: generate with `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`. Put the newest key first and keep old keys listed so you can rotate.
    - `SITE_URL=https://viltrumlik.uz`
-6. nginx (`/etc/nginx/sites-available/viltrumlik`, inside the proxy `location`): `proxy_set_header X-Real-IP $remote_addr;` — the contact-form and studio-login rate limits read the client IP from it.
-7. Install the job timer: copy `deploy/guts-jobs.service` and `deploy/guts-jobs.timer` to `/etc/systemd/system/`, then `systemctl daemon-reload && systemctl enable --now guts-jobs.timer`.
-8. `systemctl restart guts.service`, then connect services in `/studio/`.
+2. nginx (`/etc/nginx/sites-available/viltrumlik`, inside the proxy `location`): `proxy_set_header X-Real-IP $remote_addr;`. The contact-form and studio-login rate limits read the client IP from it.
+3. Job timer: copy `deploy/guts-jobs.service` and `deploy/guts-jobs.timer` to `/etc/systemd/system/`, then `systemctl daemon-reload && systemctl enable --now guts-jobs.timer`.
+4. Deploy script: `install -m 755 deploy/portfolio-deploy.sh /usr/local/bin/portfolio-deploy`. Reinstall it by hand when it changes; a deploy never replaces its own script.
+5. Deploy key: create it with `ssh-keygen -t ed25519 -N "" -f deploy_key`.
+   - Add the public key to root's `~/.ssh/authorized_keys` as `command="/usr/local/bin/portfolio-deploy",restrict ssh-ed25519 AAAA… github-actions-deploy`. That key can then only run the deploy: no shell, no port forwarding.
+   - Store the private key as the `DEPLOY_SSH_KEY` repository secret, then delete the local copy.
+6. Connect services in `/studio/`.
 
-Rollback: restore the previous code and `db.sqlite3.pre-atlas`, `systemctl disable --now guts-jobs.timer`, restart `guts.service`. The old tables stay in the database until a later cleanup release.
+### Rollback
+
+A failed deploy rolls itself back. To return to an earlier release on purpose, run `portfolio-deploy` again with that commit's release, or restore a pair from `/var/backups/portfolio/` by hand:
+1. Stop `guts.socket` and `guts.service`.
+2. Extract `code-<time>.tar.gz` over the app dir.
+3. Copy `db-<time>.sqlite3` to `db.sqlite3` as `guts`, and remove the `-wal` and `-shm` files.
+4. Start the socket and the service.
 
 ## License
 
